@@ -304,7 +304,7 @@ const PURPOSE_MAP = {
   joint:["count","bact","afb","fungal"],
   abscess:["bact","afb","fungal","cyto"],
   bile:["bact","cyto"],
-  neph:["bact","cyto"],
+  neph:["bact","count","cyto"],
 };
 
 /* PROTOCOLS[site][specimen][purpose] = {...}
@@ -323,8 +323,8 @@ SITES.forEach(({id:site}) => {
   /* ---- Tissue: bacterial culture (UPHS: Tissue Culture C TISS + Anaerobic C ANA) ---- */
   SPECIMENS.tissue.forEach(({id}) => setP(site, id, "bact", {
     orders:["TISSUE CULTURE","ANAEROBIC CULTURE"],
-    container: pah ? "Sterile, leak-proof container (PAH does not accept Eswab)"
-                   : "Sterile, leak-proof container or Eswab",
+    container: pah ? "Sterile, leak-proof container (syringe). PAH does not accept Eswab"
+                   : "Sterile, leak-proof container (syringe) or Eswab",
     medium:"None. Send fresh",
     destination:"Microbiology",
     notes:"Room temperature. Specimen source required on the order. Eswab stable 24 h. Anaerobic culture stable <1 h if not collected anaerobically; note if Actinomyces suspected. LIS: C TISS, C ANA.",
@@ -386,7 +386,7 @@ SITES.forEach(({id:site}) => {
     .filter(({id}) => PURPOSE_MAP[id].includes("fungal"))
     .forEach(({id}) => setP(site, id, "fungal", {
       orders:["FUNGUS CULTURE"],
-      container:"Sterile, leak-proof container (3 mL fluid or tissue) or Eswab",
+      container:"Sterile, leak-proof container (syringe), 3 mL fluid or tissue, or Eswab",
       medium:"None",
       destination:"Microbiology",
       notes:"Room temperature. Eswab stable 24 h. Rejected if >24 h after collection, leaking, or non-sterile. Specimen source required. ID and susceptibility on positives are performed only at HUP. PennChart C6000542; LIS: C FUNG. A FUNGAL STAIN (C FUNST) can be added on the same specimen; it needs approval except for brain, skin biopsy, sinus, and clot/emboli." +
@@ -400,7 +400,7 @@ SITES.forEach(({id:site}) => {
     .filter(({id}) => PURPOSE_MAP[id].includes("afb"))
     .forEach(({id}) => setP(site, id, "afb", {
       orders:["AFB STAIN & CULTURE"],
-      container:"Sterile, leak-proof container. Eswab only if the specimen can only be collected by swab",
+      container:"Sterile, leak-proof container (syringe). Eswab only if the specimen can only be collected by swab",
       medium:"None",
       destination:"Microbiology",
       notes:"Room temperature. Stable 24 h ambient, 1 week refrigerated. Specimen source required. Negative cultures reported after 6 weeks. If ordering other cultures or molecular tests, send an additional >5 mL. LIS: C AFB." +
@@ -531,7 +531,7 @@ SITES.forEach(({id:site}) => {
   /* ---- Pleural / ascites / joint: bacterial culture (C BF + C ANA) ---- */
   ["pleural","ascites","joint"].forEach(id => setP(site, id, "bact", {
     orders:["BODY FLUID CULTURE","ANAEROBIC CULTURE"],
-    container:"Sterile, leak-proof container",
+    container:"Sterile, leak-proof container (syringe)",
     medium:"None",
     destination:"Microbiology",
     notes:"Refrigerate (stable 2 h), except if Neisseria or Haemophilus suspected: room temp, deliver immediately. Specimen source required. Anaerobic: 1 mL fluid in anaerobic transport media or Eswab. LIS: C BF, C ANA." +
@@ -543,7 +543,7 @@ SITES.forEach(({id:site}) => {
   /* ---- Abscess / collection: Routine Culture (C ROUTINE) ---- */
   setP(site, "abscess", "bact", {
     orders:["ROUTINE CULTURE","ANAEROBIC CULTURE"],
-    container:"Sterile, leak-proof container (2 mL) or Eswab",
+    container:"Sterile, leak-proof container (syringe), 2 mL, or Eswab",
     medium:"None",
     destination:"Microbiology",
     notes:"Room temperature. Rejected if >24 h after collection or dry swab. Specimen source required. LIS: C ROUTINE, C ANA.",
@@ -553,7 +553,7 @@ SITES.forEach(({id:site}) => {
   /* ---- Bile: Routine Culture ---- */
   setP(site, "bile", "bact", {
     orders:["ROUTINE CULTURE"],
-    container:"Sterile, leak-proof container (2 mL) or Eswab",
+    container:"Sterile, leak-proof container (syringe), 2 mL, or Eswab",
     medium:"None",
     destination:"Microbiology",
     notes:"Directory lists Routine Culture for biliary specimens. Room temperature. Specimen source required. LIS: C ROUTINE.",

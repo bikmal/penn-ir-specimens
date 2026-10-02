@@ -32,6 +32,19 @@
 
   main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:18px 16px 32px}
 
+  .crumbs:empty{display:none}
+  .intro{padding:6px 0 4px}
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red)}
+  .intro-h{font-size:26px;line-height:1.2;margin:6px 0 10px}
+  .intro-p{font-size:15px;color:var(--muted);line-height:1.5}
+  .btn.start{width:100%;margin:18px 0 20px;padding:14px;font-size:16px}
+  .how{display:grid;gap:8px;margin-bottom:14px}
+  .how div{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;font-weight:500}
+  .how span{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .rule{background:var(--red-soft);border-left:4px solid var(--red);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.45}
+  .rule b{color:var(--red)}
+  .src{font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.5}
+  .src .badge{margin:0;font-size:10.5px;padding:1px 7px}
   .crumbs{display:flex;align-items:center;gap:10px;margin-bottom:12px;min-height:34px}
   .back{font:inherit;font-size:14px;font-weight:600;color:var(--blue);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;flex-shrink:0}
   .back:hover{border-color:var(--blue)}
@@ -491,7 +504,7 @@ SITES.forEach(({id:site}) => {
 const PROTO_ORDER = ["path","bact","afb","fungal","flow","cyto","count","molec"];
 const FRESH_PURPOSES = ["bact","afb","fungal","flow","molec","cyto"];
 
-const state = { site:null, cat:null, spec:null, picks:[], showResult:false };
+const state = { intro:true, site:null, cat:null, spec:null, picks:[], showResult:false };
 const $view = document.getElementById("view");
 const $crumbs = document.getElementById("crumbs");
 
@@ -522,10 +535,12 @@ function goBack(){
   else if(state.spec){ state.spec=null; state.picks=[]; }
   else if(state.cat) state.cat=null;
   else if(state.site) state.site=null;
+  else state.intro=true;
   render();
 }
 function renderCrumbs(){
-  if(!state.site){ $crumbs.innerHTML=""; return; }
+  if(state.intro){ $crumbs.innerHTML=""; return; }
+  if(!state.site){ $crumbs.innerHTML=`<button class="back" id="topBack">‹ Back</button>`; document.getElementById("topBack").onclick=goBack; return; }
   const ctx=[siteById(state.site).name, state.cat&&catById(state.cat).name, state.spec&&specById(state.spec).name].filter(Boolean).join(" · ");
   $crumbs.innerHTML=`<button class="back" id="topBack">‹ Back</button><span class="ctx">${ctx}</span>`;
   document.getElementById("topBack").onclick=goBack;
@@ -580,6 +595,24 @@ function badge(p){
        : `<span class="badge prov">Provisional · not yet verified</span>`;
 }
 
+function renderIntro(){
+  $view.innerHTML = `
+    <section class="intro">
+      <p class="eyebrow">Interventional Radiology · Penn Medicine sites</p>
+      <h2 class="intro-h">Send every specimen the right way, the first time.</h2>
+      <p class="intro-p">A quick point-of-care reference for what container, medium and lab each IR specimen needs, so nothing ends up in formalin that shouldn't.</p>
+      <button class="btn primary start" id="startBtn">Start a lookup</button>
+      <div class="how">
+        <div><span>1</span>Pick the hospital</div>
+        <div><span>2</span>Pick the specimen</div>
+        <div><span>3</span>Select every test it's going for</div>
+      </div>
+      <div class="rule"><b>Rule of thumb:</b> anything for culture, flow, cytology or FISH goes FRESH. Split it off before anything touches formalin.</div>
+      <p class="src">Built from the UPHS Laboratory Test Directory. Items marked <span class="badge prov">Provisional</span> are not yet confirmed. When in doubt, call the lab.</p>
+    </section>`;
+  document.getElementById("startBtn").onclick = () => { state.intro=false; render(); };
+}
+
 function renderResult(){
   const picks = PROTO_ORDER.filter(k => state.picks.includes(k));
   try{ window.goatcounter?.count?.({ path:`lookup/${state.site}/${state.spec}/${picks.join("+")}`,
@@ -613,6 +646,7 @@ function renderResult(){
 function render(){
   renderCrumbs();
   window.scrollTo({top:0});
+  if(state.intro) return renderIntro();
   if(!state.site){
     return screen(1,"Which hospital?", SITES.map(s=>({name:s.name,desc:s.desc,go:()=>{state.site=s.id;render();}})), true);
   }

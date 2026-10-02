@@ -560,6 +560,17 @@ SITES.forEach(({id:site}) => {
     source:"directory",
   });
 
+  /* ---- Nephrostomy urine: cell count (UPHS: Urinalysis, Microscopic / UA Dipstick & Microscopic) ---- */
+  setP(site, "neph", "count", {
+    orders:["URINALYSIS MICROSCOPIC (C2001537)","or URINALYSIS WITH MICRO AND DIPSTICK (O16822)"],
+    container:"BD Vacutainer Plus UA tube (urinalysis tube) with secure lid. Pour off from the cup",
+    medium:"5 mL urine for microscopic only; 10 mL if dipstick is included",
+    destination:"Chemistry",
+    notes:"Room temperature. Stable 72 h in the UA tube. Unpreserved urine is rejected after 2 h unless refrigerated. Send a separate urine culture tube if culture is also needed. Result STAT 1 h, routine 2–3 h.",
+    alert:"send the urine collection cup. It leaks in transport.",
+    source:"directory",
+  });
+
   /* ---- Nephrostomy urine: Urine Culture (C UC) ---- */
   setP(site, "neph", "bact", {
     orders:["URINE CULT W SENSITIVITY"],
@@ -600,6 +611,8 @@ function purposeLabel(spec, k){
     return { name:"Lymphoma workup", desc:"Flow / heme path. Send fresh" };
   if(k==="cyto" && catById(state.cat)?.id==="tissue")
     return { name:"FNA cytology", desc:"Fine needle aspirate" };
+  if(k==="count" && spec==="neph")
+    return { name:"Cell count (UA microscopic)", desc:"Urine RBC / WBC" };
   if(k==="cyto" && spec==="bile")
     return { name:"Cytology (brushing)", desc:"Biliary brushing" };
   return PURPOSES[k];

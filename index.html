@@ -270,6 +270,7 @@ const SPECIMENS = {
     { id:"bone",      name:"Bone" },
     { id:"soft",      name:"Soft tissue" },
     { id:"adrenal",   name:"Adrenal" },
+    { id:"bm",        name:"Bone marrow", desc:"Core biopsy + aspirate" },
   ],
   fluid: [
     { id:"pleural",   name:"Pleural fluid" },
@@ -290,6 +291,9 @@ const PURPOSES = {
   flow:  { name:"Flow cytometry",      desc:"Leukemia / lymphoma" },
   molec: { name:"Molecular / FISH" },
   count: { name:"Cell count" },
+  aspirate:{ name:"Aspirate", desc:"Flow, cytogenetics, FISH, molecular" },
+  slides:{ name:"Bedside slides", desc:"Smears / touch preps (optional)" },
+  salcore:{ name:"Extra core in saline", desc:"If a second core is taken" },
 };
 
 /* Which purposes show for each specimen */
@@ -303,6 +307,7 @@ const PURPOSE_MAP = {
   bone:["path","bact","afb","fungal","molec"],
   soft:["path","flow","bact","afb","fungal"],
   adrenal:["path","cyto"],
+  bm:["path","aspirate","slides","salcore"],
   pleural:["cyto","count","bact","afb","fungal","flow"],
   ascites:["cyto","count","bact","afb","fungal","flow"],
   joint:["count","bact","afb","fungal"],
@@ -564,6 +569,48 @@ SITES.forEach(({id:site}) => {
     source:"directory",
   });
 
+  /* ---- Bone marrow (Penn Bone Marrow Collection + Slide Tip Sheets) ---- */
+  const bmOrder = ["SURGICAL PATHOLOGY - HEMATOLOGIC (SPHEM)","Px SGPATH11"];
+  const bmDest = site === "hup"
+    ? "Hand deliver to Central Receiving and Processing, 7 Founders, within 1 h of collection"
+    : "Ship to HUP Central Receiving and Processing per this site's requirements";
+  const bmCommon = " Collections M–F only; weekends/holidays call the Heme Path fellow on call, 215-265-1089. Heme Path lab: 215-662-6196. Bag all samples together with the requisition, patient ID facing out. Lids: seat evenly and listen for two clicks; don't tape a label over the lid.";
+  setP(site, "bm", "path", {
+    orders: bmOrder,
+    container:"Zinc formalin fixative container (Lawson #288290)",
+    medium:"Zinc formalin, first core",
+    destination: bmDest,
+    notes:"Place a separate order for each sample type. If only a core is sent, order only the biopsy sample. STAT or Routine Immediate prints Cerner labels right away." + bmCommon,
+    alert:"put the aspirate in formalin. It goes in the heparin/EDTA tubes.",
+    source:"directory",
+  });
+  setP(site, "bm", "aspirate", {
+    orders: bmOrder,
+    container:"1 sodium heparin (green) glass tube, fill to 2 mL, + 3 lavender (EDTA) tubes, fill to 2 mL each. Collect all 4 when possible",
+    medium:"Fresh, anticoagulated",
+    destination: bmDest,
+    notes:"List flow, cytogenetics, FISH and molecular as \"special studies\" on the aspirate order only. Dry tap: even a drop in a lavender tube; order the aspirate and the lab decides if it's adequate. Send-outs must go through the lab: include the outside requisition and an extra tube in the bag." + bmCommon,
+    alert:"put aspirate in formalin, or leave lids unseated. Leaks have lost many specimens.",
+    source:"directory",
+  });
+  setP(site, "bm", "salcore", {
+    orders: bmOrder,
+    container:"Saline-filled container",
+    medium:"Saline, fresh",
+    destination: bmDest,
+    notes:"For an extra core if collected. For a dry tap, the lab can try ancillary testing on a core in saline." + bmCommon,
+    alert:"put the extra core in formalin if it's meant for ancillary studies.",
+    source:"directory",
+  });
+  setP(site, "bm", "slides", {
+    container:"Glass slides in a plastic slide mailer (Fisher #22363901, Lawson #108587)",
+    medium:"Air-dried, unfixed",
+    destination: bmDest,
+    notes:"Optional, but helpful if the aspirate is aspicular or hemodilute. Smears: a small drop 1/3 from the frosted end, touch two slides together without pressing, pull apart in one motion. Touch preps: dab the core gently several times for a faint print. Dry completely before the mailer. Label the frosted end with 2 identifiers (a small Cerner label is fine).",
+    alert:"use big drops or a wet core. Thick areas won't dry or stain. Only plastic slide mailers.",
+    source:"directory",
+  });
+
   /* ---- Nephrostomy urine: cell count (UPHS: Urinalysis, Microscopic / UA Dipstick & Microscopic) ---- */
   setP(site, "neph", "count", {
     orders:["URINALYSIS MICROSCOPIC (C2001537)","or URINALYSIS WITH MICRO AND DIPSTICK (O16822)"],
@@ -590,8 +637,8 @@ SITES.forEach(({id:site}) => {
 /* ============================================================
    APP
    ============================================================ */
-const PROTO_ORDER = ["path","bact","afb","fungal","flow","cyto","count","molec"];
-const FRESH_PURPOSES = ["bact","afb","fungal","flow","molec","cyto"];
+const PROTO_ORDER = ["path","aspirate","salcore","slides","bact","afb","fungal","flow","cyto","count","molec"];
+const FRESH_PURPOSES = ["bact","afb","fungal","flow","molec","cyto","aspirate","salcore"];
 
 const state = { intro:false, site:null, cat:null, spec:null, picks:[], showResult:false };
 const $view = document.getElementById("view");
@@ -611,6 +658,7 @@ const proto = (spec, k) => PROTOCOLS[state.site]?.[spec]?.[k];
 
 /* Penn calls fresh-tissue flow a "Lymphoma Work-Up" */
 function purposeLabel(spec, k){
+  if(spec==="bm" && k==="path") return { name:"Core biopsy", desc:"Histology (first core)" };
   if(k==="flow" && catById(state.cat)?.id==="tissue")
     return { name:"Lymphoma workup", desc:"Flow / heme path. Send fresh" };
   if(k==="cyto" && catById(state.cat)?.id==="tissue")
@@ -732,6 +780,7 @@ const CUP = (fill) => `<svg viewBox="0 0 64 64" width="46" height="46"><rect x="
 const SYRINGE = `<svg viewBox="0 0 96 40" width="62" height="26"><rect x="6" y="14" width="8" height="12" rx="1" fill="#9AA3B5"/><rect x="14" y="18" width="12" height="4" fill="#9AA3B5"/><rect x="26" y="9" width="44" height="22" rx="3" fill="#fff" stroke="#9AA3B5" stroke-width="2"/><rect x="28" y="11" width="22" height="18" fill="#F3D9C9"/><path d="M70 16h8v8h-8z" fill="#9AA3B5"/><path d="M78 19h14v2H78z" fill="#5E6577"/></svg>`;
 const SWAB = `<svg viewBox="0 0 40 96" width="22" height="54"><rect x="9" y="4" width="22" height="14" rx="3" fill="#F2C94C"/><path d="M11 18h18v64a9 9 0 0 1-18 0z" fill="#fff" stroke="#9AA3B5" stroke-width="2"/><rect x="19" y="22" width="2" height="50" fill="#5E6577"/><ellipse cx="20" cy="76" rx="4" ry="7" fill="#C8B9A6"/></svg>`;
 const BOTTLE = `<svg viewBox="0 0 64 80" width="40" height="50"><rect x="22" y="4" width="20" height="12" rx="2" fill="#2E2E2E"/><path d="M18 16h28v8l6 6v40a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6V30l6-6z" fill="#fff" stroke="#9AA3B5" stroke-width="2"/><rect x="13" y="44" width="38" height="26" fill="#F3E0A6" opacity=".7"/></svg>`;
+const SLIDE = `<svg viewBox="0 0 80 40" width="56" height="28"><rect x="4" y="8" width="72" height="24" rx="2" fill="#EAF2FB" stroke="#9AA3B5" stroke-width="2"/><rect x="4" y="8" width="18" height="24" fill="#D6DBE3"/><ellipse cx="46" cy="20" rx="12" ry="7" fill="#E7A9A9" opacity=".8"/></svg>`;
 function containerIcons(p){
   const t = (p.container||"")+" "+(p.medium||"");
   const out=[];
@@ -747,6 +796,7 @@ function containerIcons(p){
   else if(/saline/i.test(t)) add(CUP("#BFD8F2"),"Cup + saline");
   else if(!out.length || /sterile.*container|specimen container/i.test(t)) add(CUP(),"Sterile cup");
   if(/Eswab/i.test(t)) add(SWAB,"Eswab");
+  if(/slide/i.test(t)) { out.length=0; add(SLIDE,"Slides + mailer"); }
   return out.length?`<div class="ics">${out.join("")}</div>`:"";
 }
 function renderResult(){

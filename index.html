@@ -176,6 +176,33 @@
     .st{padding:10px 8px;font-size:12px;flex-direction:column;gap:4px;text-align:center}
     .st small{display:none}
   }
+  .res{background:#FCFCFA;border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:18px}
+  .res-h{background:var(--blue);color:#fff;padding:20px 24px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:4px solid var(--red)}
+  .res-h h3{font-size:22px;font-weight:700;line-height:1.2}
+  .res-h p{font-size:14.5px;opacity:.65;margin-top:4px}
+  .res-site{background:#FCE9E9;color:var(--red);border:1.5px solid var(--accent);font-weight:700;font-size:13.5px;padding:5px 12px;border-radius:8px;white-space:nowrap}
+  .res-o{background:var(--blue-2);color:#fff;padding:14px 24px 16px}
+  .res-o-k{font-size:11.5px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent)}
+  .res-o-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .res-o-pills span{background:#FDF3F3;color:var(--blue);font-weight:700;font-size:14px;padding:6px 14px;border-radius:8px;border:1.5px solid var(--accent)}
+  .r-row{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:14px 24px;border-top:1px solid var(--line)}
+  .r-row:first-child{border-top:0}
+  .r-k{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#7A8296;padding-top:2px}
+  .r-v{font-size:15.5px;line-height:1.5}
+  .r-alert{display:flex;gap:10px;border-radius:12px;padding:14px 18px;margin-top:10px;font-size:15px;line-height:1.45}
+  .r-alert b{font-weight:700}
+  .r-alert.warn{background:#FFF9EA;border:1.5px solid #F2D78C;color:#7A4A0B}
+  .r-alert.info{background:#EEF2FA;border:1.5px solid #C9D3E8;color:var(--blue)}
+  .r-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+  .r-actions .btn{flex:0 0 auto;padding:12px 22px}
+  .r-actions .btn.primary{background:#EEF2FA;color:var(--blue);border:1.5px solid var(--blue)}
+  .r-actions .btn.ghost{border-color:var(--line);color:var(--muted)}
+  @media (max-width:600px){
+    .res-h{padding:16px 18px}.res-h h3{font-size:19px}
+    .res-o{padding:12px 18px 14px}
+    .r-row{grid-template-columns:1fr;gap:4px;padding:12px 18px}
+  }
+  @media print{.top,.hero,.notice,.stepper,.crumbs,.r-actions,footer{display:none!important}.res{break-inside:avoid}}
   @media (max-width:380px){.grid{grid-template-columns:1fr}}
 </style>
 <!-- Usage tracking (GoatCounter). Replace GC_CODE with your GoatCounter site code. Logs only site/specimen/test picked; no patient info. -->
@@ -491,7 +518,7 @@ SITES.forEach(({id:site}) => {
     const tube = countTubes[site]?.[id];
     setP(site, id, "count", {
       orders:["FLUID COUNTS (C2001521)"],
-      container: tube || "Directory lists HUP and PAH tubes only. Confirm for Presby (HUP uses " + countTubes.hup[id].toLowerCase() + ")",
+      container: tube || "Directory lists HUP and PAH tubes only. Confirm for Presby (HUP uses " + countTubes.hup[id] + ")",
       medium:"Anticoagulant tube (not a plain cup)",
       destination:"Hematology",
       notes:"Room temperature. Stable only 1 h at room temp, <8 h refrigerated, so send promptly. Result 1–2 h routine, 1 h STAT." +
@@ -689,27 +716,39 @@ function renderResult(){
   const pathFixed = picks.includes("path") && /formalin/i.test(proto(state.spec,"path")?.medium||"");
   const freshOnes = picks.filter(k => FRESH_PURPOSES.includes(k));
   const split = pathFixed && freshOnes.length
-    ? `<div class="alert split"><b>Split it.</b> Set aside the ${(a=>a.length>1?a.slice(0,-1).join(", ")+" and "+a.at(-1):a[0])(freshOnes.map(k=>purposeLabel(state.spec,k).name.toLowerCase()))} portion${freshOnes.length>1?"s":""} FRESH before anything touches formalin.</div>` : "";
+    ? `<div class="r-alert warn split"><b>!</b><span><b>Split it.</b> Set aside the ${(a=>a.length>1?a.slice(0,-1).join(", ")+" and "+a.at(-1):a[0])(freshOnes.map(k=>purposeLabel(state.spec,k).name.toLowerCase()))} portion${freshOnes.length>1?"s":""} FRESH before anything touches formalin.</span></div>` : "";
 
+  const site = siteById(state.site), spec = specById(state.spec);
+  const row = (k,v) => v ? `<div class="r-row"><div class="r-k">${k}</div><div class="r-v">${v}</div></div>` : "";
   const cards = picks.map(k => {
     const p = proto(state.spec,k) || {};
     const lab = purposeLabel(state.spec,k).name;
-    if(!p.container) return `<section class="rc pending"><h3>${lab}</h3><p class="how">Pending Penn protocol</p></section>`;
     const med = /^none/i.test(p.medium||"") ? "Fresh, no fixative" : p.medium;
-    return `<section class="rc">
-      <div class="rc-h"><h3>${lab}</h3>${p.source?"":`<span class="badge prov">Provisional</span>`}</div>
-      <p class="how">${p.container}</p>
-      <p class="med">${med}</p>
-      ${p.alert?`<p class="dont"><b>Don't</b> ${p.alert}</p>`:""}
-      ${p.destination?`<p class="dest"><b>To:</b> ${p.destination}</p>`:""}
-      ${p.notes?`<p class="notes">${p.notes}</p>`:""}
-      ${p.orders?.length?`<details><summary>Order name (placed by primary team)</summary><p>${p.orders.join(" + ")}</p></details>`:""}
-    </section>`;
+    return `<section class="res">
+      <div class="res-h">
+        <div><h3>${spec.name}</h3><p>${lab} · ${site.full}</p></div>
+        <span class="res-site">${site.short||site.name}</span>
+      </div>
+      ${p.orders?.length?`<div class="res-o">
+        <div class="res-o-k">Order name · placed by primary team</div>
+        <div class="res-o-pills">${p.orders.map(o=>`<span>${o}</span>`).join("")}</div>
+      </div>`:""}
+      <div class="res-b">
+        ${p.container ? row("Container", p.container) + row("Medium / prep", med) + row("Send to", p.destination) + row("Notes", p.notes)
+                      : row("Status", "Pending Penn protocol")}
+      </div>
+    </section>
+    ${p.alert?`<div class="r-alert warn"><b>!</b><span>Do not ${p.alert}</span></div>`:""}
+    ${p.container && !p.source ? `<div class="r-alert info"><b>i</b><span>Provisional for ${site.full}. Verify with the lab before clinical use.</span></div>`:""}`;
   }).join("");
 
   $view.innerHTML = `${split}${cards}
-    <div class="actions"><button class="btn primary" id="restartBtn">New specimen</button></div>`;
+    <div class="r-actions">
+      <button class="btn primary" id="restartBtn">← New lookup</button>
+      <button class="btn ghost" id="printBtn">Print / save PDF</button>
+    </div>`;
   document.getElementById("restartBtn").onclick = ()=>{ state.cat=state.spec=null; state.picks=[]; state.showResult=false; render(); };
+  document.getElementById("printBtn").onclick = ()=>window.print();
 }
 
 function render(){

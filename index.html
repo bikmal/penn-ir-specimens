@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IR Specimen Guide · Penn</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#011F5B;      /* Penn blue */
+    --blue-2:#0B2D6E;
+    --red:#990000;       /* Penn red */
+    --red-soft:#F6E6E6;
+    --bg:#F5F6F9;
+    --card:#FFFFFF;
+    --ink:#1A1F2E;
+    --muted:#5E6577;
+    --line:#DDE1EA;
+    --ok:#1E7B4B; --ok-bg:#E4F3EA;
+    --warn:#8A5A00; --warn-bg:#FFF3D6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+  header{background:var(--blue);color:#fff;padding:18px 16px 16px;border-bottom:4px solid var(--red)}
+  .hwrap{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px}
+  .logo-slot{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+  .logo-slot img{width:100%;height:100%;object-fit:contain}
+  .logo-slot span{font-weight:700;font-size:13px;letter-spacing:.5px}
+  h1{font-size:19px;font-weight:700;line-height:1.2}
+  .sub{font-size:12.5px;opacity:.8;margin-top:2px}
+
+  main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:18px 16px 32px}
+
+  .crumbs{display:flex;align-items:center;gap:10px;margin-bottom:12px;min-height:34px}
+  .back{font:inherit;font-size:14px;font-weight:600;color:var(--blue);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;flex-shrink:0}
+  .back:hover{border-color:var(--blue)}
+  .ctx{font-size:12.5px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rc{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .rc.pending{border-left-color:var(--line);color:var(--muted)}
+  .rc-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .rc h3{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--red)}
+  .rc .badge{margin:0;font-size:10.5px;padding:2px 8px}
+  .rc .how{font-size:15.5px;font-weight:700;color:var(--blue);margin-top:4px;line-height:1.3}
+  .rc .med{font-size:14px;margin-top:2px;line-height:1.35}
+  .rc .dont{font-size:13px;color:var(--red);margin-top:6px;line-height:1.35}
+  .rc .dest{font-size:13.5px;margin-top:8px;line-height:1.4}
+  .rc .dest b{color:var(--blue)}
+  .rc .notes{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45;padding-top:6px;border-top:1px solid var(--line)}
+  .rc details{margin-top:8px;font-size:13px;color:var(--muted);line-height:1.45}
+  .rc summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:13px}
+  .rc details p{margin-top:6px}
+  .rc details b{color:var(--ink)}
+  .crumb{font-size:12px;font-weight:600;background:var(--card);border:1px solid var(--line);color:var(--blue);padding:4px 10px;border-radius:999px;cursor:pointer}
+  .crumb:hover{border-color:var(--blue)}
+
+  .step-label{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:4px}
+  h2{font-size:21px;font-weight:700;color:var(--blue);margin-bottom:14px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid.one{grid-template-columns:1fr}
+  .opt{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;transition:border-color .15s,transform .1s,box-shadow .15s;min-height:64px}
+  .opt:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(1,31,91,.08)}
+  .opt:active{transform:scale(.98)}
+  .opt b{display:block;font-size:15px;font-weight:600;color:var(--blue)}
+  .opt small{display:block;font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+
+  .result-top{background:var(--blue);color:#fff;border-radius:14px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+  .result-top::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--red)}
+  .rt-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:#fff;color:var(--blue);font-weight:700;font-size:16px;padding:8px 14px;border-radius:999px;border:2px solid var(--red)}
+  .pill.pending{background:transparent;color:#fff;border:2px dashed rgba(255,255,255,.55);font-weight:600}
+  .rt-sum{font-size:13px;opacity:.85;margin-top:12px}
+
+  .badge{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:12px}
+  .badge.ok{background:var(--ok-bg);color:var(--ok)}
+  .badge.prov{background:var(--warn-bg);color:var(--warn)}
+
+  .rows{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .row{padding:13px 16px;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:none}
+  .row .k{font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+  .row .v{font-size:15px;font-weight:500}
+  .row .v.pending{color:var(--muted);font-style:italic;font-weight:400}
+  .alert{background:var(--red-soft);border-left:4px solid var(--red);border-radius:10px;padding:12px 14px;font-size:14px;margin-top:12px;line-height:1.45}
+  .alert b{color:var(--red)}
+
+  .actions{display:flex;gap:10px;margin-top:18px}
+  .btn{flex:1;font:inherit;font-weight:600;font-size:14.5px;padding:12px;border-radius:10px;cursor:pointer;border:1.5px solid var(--blue)}
+  .btn.primary{background:var(--blue);color:#fff}
+  .btn.ghost{background:#fff;color:var(--blue)}
+
+  footer{text-align:center;font-size:11.5px;color:var(--muted);padding:16px;line-height:1.5}
+  footer b{color:var(--blue)}
+
+
+  .sitebar{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px}
+  .seg{flex:1;font:inherit;font-size:13px;font-weight:600;color:var(--blue);background:none;border:0;border-radius:9px;padding:8px 4px;cursor:pointer}
+  .seg.on{background:var(--blue);color:#fff}
+  .hint{font-size:13.5px;color:var(--muted);margin:-8px 0 14px}
+  .opt.check{position:relative;padding-left:42px}
+  .opt.check::before{content:"";position:absolute;left:14px;top:16px;width:18px;height:18px;border:2px solid var(--line);border-radius:5px;background:#fff}
+  .opt.check.on{border-color:var(--blue);background:#EEF2FA}
+  .opt.check.on::before{background:var(--blue);border-color:var(--blue)}
+  .opt.check.on::after{content:"";position:absolute;left:20px;top:19px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  .tag{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--warn);background:var(--warn-bg);padding:2px 6px;border-radius:999px;vertical-align:2px;margin-left:4px}
+  .btn:disabled{opacity:.45;cursor:default}
+  .card{margin-top:16px}
+  .card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .card-h h3{font-size:16px;font-weight:700;color:var(--blue)}
+  .card-h .badge{margin-bottom:0}
+  .card-orders{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .mini-pill{font-size:12.5px;font-weight:700;color:var(--blue);background:#fff;border:1.5px solid var(--red);padding:3px 10px;border-radius:999px}
+  .alert.split{margin-top:0;margin-bottom:4px}
+  .pill.pending{font-size:13px}
+  .grab{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .grab li{background:#fff;color:var(--ink);border-left:4px solid var(--red);border-radius:10px;padding:10px 12px}
+  .grab li.g-pending{background:transparent;color:#fff;border:1.5px dashed rgba(255,255,255,.5)}
+  .g-what{display:block;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--red)}
+  .g-pending .g-what{color:#fff;opacity:.8}
+  .g-how{display:block;font-size:15.5px;font-weight:700;color:var(--blue);margin-top:2px}
+  .g-pending .g-how{color:#fff;font-weight:500;font-style:italic}
+  .order-ref{font-size:13.5px;color:var(--muted)}
+
+  @media (max-width:380px){.grid{grid-template-columns:1fr}}
+</style>
+<!-- Usage tracking (GoatCounter). Replace GC_CODE with your GoatCounter site code. Logs only site/specimen/test picked; no patient info. -->
+<script>window.GC_CODE="anirudh";</script>
+<script>if(window.GC_CODE!=="GC_CODE"){var g=document.createElement("script");g.async=true;g.src="https://gc.zgo.at/count.js";g.dataset.goatcounter="https://"+window.GC_CODE+".goatcounter.com/count";document.head.appendChild(g);}</script>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <!-- Logo slot: drop an approved logo file next to index.html as logo.png -->
+    <div class="logo-slot" id="logoSlot"><span>IR</span></div>
+    <div>
+      <h1>IR Specimen Handling Guide</h1>
+      <div class="sub">Penn Medicine sites · Point-of-care reference</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="crumbs" id="crumbs"></div>
+  <div id="view"></div>
+</main>
+
+<footer>
+  Provisional tool. Always confirm with the posted site protocol or lab if unsure.<br>
+  Built by <b>Anirudh Bikmal</b>
+</footer>
+
+<script>
+/* ============================================================
+   CONFIG — edit these lists as Penn protocols come in
+   ============================================================ */
+
+const SITES = [
+  { id:"hup",  name:"HUP",                    desc:"Hospital of the University of Pennsylvania" },
+  { id:"ppmc", name:"Penn Presbyterian", short:"Presby",      desc:"Penn Presbyterian Medical Center" },
+  { id:"pah",  name:"Pennsylvania Hospital", short:"PAH",  desc:"Pennsylvania Hospital" },
+];
+
+const CATEGORIES = [
+  { id:"tissue", name:"Tissue biopsy",  desc:"Core / FNA from organ or mass" },
+  { id:"fluid",  name:"Body fluid",     desc:"Aspirate, drainage, or collection" },
+];
+
+const SPECIMENS = {
+  tissue: [
+    { id:"liver_nt",  name:"Liver, nontargeted",  desc:"Medical / parenchymal" },
+    { id:"liver_m",   name:"Liver mass" },
+    { id:"kidney_nt", name:"Kidney, nontargeted", desc:"Medical renal" },
+    { id:"kidney_m",  name:"Kidney mass" },
+    { id:"lung",      name:"Lung" },
+    { id:"ln",        name:"Lymph node" },
+    { id:"bone",      name:"Bone" },
+    { id:"soft",      name:"Soft tissue" },
+    { id:"adrenal",   name:"Adrenal" },
+  ],
+  fluid: [
+    { id:"pleural",   name:"Pleural fluid" },
+    { id:"ascites",   name:"Ascites / peritoneal" },
+    { id:"joint",     name:"Joint fluid" },
+    { id:"abscess",   name:"Abscess / collection" },
+    { id:"bile",      name:"Bile" },
+    { id:"neph",      name:"Nephrostomy urine" },
+  ],
+};
+
+const PURPOSES = {
+  path:  { name:"Histopathology",      desc:"Routine surgical pathology" },
+  bact:  { name:"Bacterial culture",   desc:"Aerobic + anaerobic" },
+  afb:   { name:"AFB culture",         desc:"Mycobacteria" },
+  fungal:{ name:"Fungal culture" },
+  cyto:  { name:"Cytology",            desc:"Non-gyn cytology" },
+  flow:  { name:"Flow cytometry",      desc:"Leukemia / lymphoma" },
+  molec: { name:"Molecular / FISH" },
+  count: { name:"Cell count" },
+};
+
+/* Which purposes show for each specimen */
+const PURPOSE_MAP = {
+  liver_nt:["path","bact","afb","fungal"],
+  liver_m:["path","cyto","molec","bact"],
+  kidney_nt:["path"],
+  kidney_m:["path","cyto","molec"],
+  lung:["path","cyto","molec","bact","afb","fungal"],
+  ln:["path","flow","cyto","bact","afb","fungal"],
+  bone:["path","bact","afb","fungal","molec"],
+  soft:["path","flow","bact","afb","fungal"],
+  adrenal:["path","cyto"],
+  pleural:["cyto","count","bact","afb","fungal","flow"],
+  ascites:["cyto","count","bact","afb","fungal","flow"],
+  joint:["count","bact","afb","fungal"],
+  abscess:["bact","afb","fungal","cyto"],
+  bile:["bact","cyto"],
+  neph:["bact","cyto"],
+};
+
+/* PROTOCOLS[site][specimen][purpose] = {...}
+   Fill in as Penn protocols arrive. Anything missing shows as "Pending".
+   verified:true only after checking against posted protocol + lab directory. */
+/* source: "verified" = posted protocol + directory; "directory" = UPHS test directory only */
+const PROTOCOLS = {};
+function setP(site, spec, purpose, obj){
+  PROTOCOLS[site] ??= {}; PROTOCOLS[site][spec] ??= {};
+  PROTOCOLS[site][spec][purpose] = obj;
+}
+
+SITES.forEach(({id:site}) => {
+  const pah = site === "pah";
+
+  /* ---- Tissue: bacterial culture (UPHS: Tissue Culture C TISS + Anaerobic C ANA) ---- */
+  SPECIMENS.tissue.forEach(({id}) => setP(site, id, "bact", {
+    orders:["TISSUE CULTURE","ANAEROBIC CULTURE"],
+    container: pah ? "Sterile, leak-proof container (PAH does not accept Eswab)"
+                   : "Sterile, leak-proof container or Eswab",
+    medium:"None. Send fresh",
+    destination:"Microbiology",
+    notes:"Room temperature. Specimen source required on the order. Eswab stable 24 h. Anaerobic culture stable <1 h if not collected anaerobically; note if Actinomyces suspected. LIS: C TISS, C ANA.",
+    alert:"put it in formalin.",
+    source:"directory",
+  }));
+
+  /* ---- Tissue: histopathology (UPHS: Tissue, Routine Processing) ---- */
+  SPECIMENS.tissue.filter(s => s.id !== "kidney_nt").forEach(({id}) => setP(site, id, "path", {
+    orders:[],
+    container:"Labeled specimen container",
+    medium:"Formalin. Send FRESH instead if special studies are needed",
+    destination: site === "hup"
+      ? "Surgical Pathology: HUP 6 Founders (7:30a–7p); after 7p, 7 Founders Central Receiving"
+      : null,
+    notes:"Label with name, MRN, DOB, specimen type, and specimen number. List clinical info and any special studies. Fresh specimens: refrigerate, max overnight except weekends." +
+      (id === "ln" ? " Lymph node: if lymphoma is on the differential, send fresh in saline and also select Lymphoma workup." : ""),
+    source:"directory",
+  }));
+
+  const spDest = site === "hup"
+    ? "Surgical Pathology: HUP 6 Founders (7:30a–7p); after 7p, 7 Founders Central Receiving"
+    : null;
+
+  /* ---- Kidney, nontargeted (UPHS: Biopsy, Kidney incl. H&E, special stains, IF, EM) ---- */
+  setP(site, "kidney_nt", "path", {
+    orders:[],
+    container:"Specimen container, cores on saline-moistened gauze pad",
+    medium:"FRESH. No fixative",
+    destination: site === "hup" ? "Surgical Pathology (deliver immediately)" : null,
+    notes:"Deliver fresh, immediately. Covers H&E, special stains, IF and EM. On the requisition, list source as fresh. Questions: 215-662-6519 during hours (M–F 8a–6p); after hours, page SP fellow 215-487-8638.",
+    alert:"put medical kidney biopsies in formalin. IF cannot be performed on formalin-fixed tissue.",
+    source:"directory",
+  });
+
+  /* ---- Liver, nontargeted (UPHS: Biopsy, Liver) ---- */
+  setP(site, "liver_nt", "path", {
+    orders:[],
+    container:"Labeled specimen container",
+    medium:"Neutral buffered formalin",
+    destination: spDest,
+    notes:"At least one 20 × 1 mm core. Tissue for iron or copper quantification also goes in formalin. If EM is needed, get glutaraldehyde from Surgical Pathology and consult SP staff. Transplant biopsies: same-day STAT if on 6 Founders by 11a; after 11a, needs approval (page 215-487-8638).",
+    source:"directory",
+  });
+
+  /* ---- Lymphoma workup, any tissue (UPHS: Lymphoma Work-Up) ---- */
+  ["ln","soft"].forEach(id => setP(site, id, "flow", {
+    orders:[],
+    container:"Specimen container",
+    medium:"Fresh, unfixed, in saline or on saline-moistened gauze",
+    destination:"Surgical Pathology / Heme Path. Send via pneumatic tube ASAP",
+    notes:"State “lymphoma suspected” clearly on the requisition. Send enough tissue for a full workup. Before collecting, page about collection and transport: M–F 7a–8p and Sat 8a–3p, Heme Path fellow 215-980-9781. Weekdays after 8p, CP resident on call 215-306-0286. Sat 3p to Mon 7a, CP resident 215-306-0286 (at 7a). Flow lab: room temp, stable 48 h, performed M–F; do not centrifuge. Needs a flow order or manual requisition with contact info.",
+    alert:"put it in formalin. A workup can't start on fixed tissue.",
+    source:"directory",
+  }));
+
+  /* ---- Fungal culture, any tissue or fluid (UPHS: Fungal Culture, Other; C FUNG) ---- */
+  Object.values(SPECIMENS).flat()
+    .filter(({id}) => PURPOSE_MAP[id].includes("fungal"))
+    .forEach(({id}) => setP(site, id, "fungal", {
+      orders:["FUNGUS CULTURE"],
+      container:"Sterile, leak-proof container (3 mL fluid or tissue) or Eswab",
+      medium:"None",
+      destination:"Microbiology",
+      notes:"Room temperature. Eswab stable 24 h. Rejected if >24 h after collection, leaking, or non-sterile. Specimen source required. ID and susceptibility on positives are performed only at HUP. PennChart C6000542; LIS: C FUNG. A FUNGAL STAIN (C FUNST) can be added on the same specimen; it needs approval except for brain, skin biopsy, sinus, and clot/emboli." +
+        (["pleural","ascites"].includes(id) ? " BACTEC vials are not valid for non-Candida fungal culture." : ""),
+      alert:"put it in formalin.",
+      source:"directory",
+    }));
+
+  /* ---- AFB culture, any tissue or fluid (UPHS: Mycobacterial Culture, Other; C AFB) ---- */
+  Object.values(SPECIMENS).flat()
+    .filter(({id}) => PURPOSE_MAP[id].includes("afb"))
+    .forEach(({id}) => setP(site, id, "afb", {
+      orders:["AFB STAIN & CULTURE"],
+      container:"Sterile, leak-proof container. Eswab only if the specimen can only be collected by swab",
+      medium:"None",
+      destination:"Microbiology",
+      notes:"Room temperature. Stable 24 h ambient, 1 week refrigerated. Specimen source required. Negative cultures reported after 6 weeks. If ordering other cultures or molecular tests, send an additional >5 mL. LIS: C AFB." +
+        (["pleural","ascites"].includes(id) ? " AFB stain is not done on pleural or peritoneal fluid if <15 mL is received. Send ≥15 mL." : ""),
+      alert:"send on any swab other than an Eswab, or let tissue dry out. Both are rejected.",
+      source:"directory",
+    }));
+
+  /* ---- Molecular / FISH, tissue (UPHS: FISH Analysis, Neoplastic) ---- */
+  Object.values(SPECIMENS).flat()
+    .filter(({id}) => PURPOSE_MAP[id].includes("molec"))
+    .forEach(({id}) => setP(site, id, "molec", {
+      orders:["FISH ANALYSIS, NEOPLASTIC"],
+      container:"Sterile, non-additive, leak-proof container",
+      medium:"None. Send fresh, as is",
+      destination:"Cytogenetics (HUP). Questions: 215-662-4937",
+      notes:"Room temperature. Stable 24 h ambient, 48 h refrigerated. Order must be placed AND released in PennChart. Performed M–F 8a–5p; routine 3–10 business days, STAT <24 h." +
+        (id === "lung" ? " Lung cancer panel covers ALK, ROS1 and RET." : "") +
+        " This is the fresh-specimen order. If FISH will be run on the formalin-fixed path block instead, confirm with Cytogenetics.",
+      alert:"spin, separate, freeze, or add fixative. Each makes the specimen unacceptable.",
+      source:"directory",
+    }));
+
+  /* ---- Nephrostomy urine: cytology (UPHS: Cytology, Urine; NGUR) ---- */
+  setP(site, "neph", "cyto", {
+    orders:["NGUR"],
+    container:"Sterile container",
+    medium:"None. 50 mL fresh, unfixed",
+    destination: site === "hup"
+      ? "Cytopathology: 6 Founders (7:30a–10p); after 10p, 7 Founders Central Receiving. 3 PAV Central Receiving any time"
+      : "Cytopathology",
+    notes: site === "hup"
+      ? "Label with Cerner lab label (two patient identifiers and specimen source)."
+      : "Label with patient name, DOB, MRN, and collection site.",
+    alert:"add fixative or send a 24-hour collection.",
+    source:"directory",
+  });
+
+  /* ---- Cytopathology shared bits (UPHS Cytopathology pages) ---- */
+  const cytoLabel = site === "hup"
+    ? "Affix Cerner lab label (two patient identifiers and specimen source)."
+    : "Label with patient name, DOB, MRN, and collection site.";
+  const cytoDest = site === "hup"
+    ? "Cytopathology: 6 Founders (7:30a–10p); after 10p, 7 Founders Central Receiving. 3 PAV Central Receiving any time"
+    : "Cytology lab (8a–4:30p); after 4:30p, Central Receiving";
+
+  /* ---- FNA, any tissue (UPHS: Cytology, Fine Needle Aspiration) ---- */
+  SPECIMENS.tissue.filter(({id}) => PURPOSE_MAP[id].includes("cyto")).forEach(({id}) => setP(site, id, "cyto", {
+    orders:["CYTOPATHOLOGY - OTHER (NGPATH3)"],
+    container:"Sterile container; prepared slides labeled with patient name and DOB",
+    medium:"None. Fresh, no fixative",
+    destination: site === "hup" ? cytoDest : "Cytopathology",
+    notes:"Free-text the site in the order description. On-site adequacy evaluation recommended: " +
+      (site === "hup" ? "schedule with Cytology lab (215-662-6526) during business hours. "
+                      : "call 215-829-8035 for a cytotechnologist, 8a–4p. ") +
+      cytoLabel + " For flow, send a separate fresh aliquot with its own order. For molecular or special studies, select that option in the order.",
+    alert:"use a container with fixative. Non-diagnostic if no cells are present.",
+    source:"directory",
+  }));
+
+  /* ---- Pleural / ascites cytology (UPHS: Cytology, Body Fluids) ---- */
+  ["pleural","ascites"].forEach(id => setP(site, id, "cyto", {
+    orders:["CYTOPATHOLOGY - BODY FLUID (NGPATH3)"],
+    container:"500 mL or larger evacuated container(s)",
+    medium:"None. Fresh, no fixative",
+    destination: cytoDest,
+    notes:"Send at least 75–100 mL; false negatives rise at lower volumes. " + cytoLabel +
+      " For flow, send a separate fresh aliquot with its own order. For molecular or special studies, pick from the Special Studies prompt on the order. Include clinical information.",
+    alert:"collect in a container with fixative.",
+    source:"directory",
+  }));
+
+  /* ---- Abscess / collection cytology: provisional, no directory page ---- */
+  setP(site, "abscess", "cyto", {
+    orders:["CYTOPATHOLOGY - OTHER (NGPATH3)"],
+    container:"Sterile container",
+    medium:"None. Fresh, no fixative",
+    destination: cytoDest,
+    notes:"No directory page covers abscess fluid. This uses the general Cytopathology - Other order (free-text the source) with the same handling as the other non-gyn cytology pages. The 75–100 mL minimum on the body fluid page is for effusions and doesn't apply here. " + cytoLabel + " Confirm with Cytopathology.",
+    alert:"collect in a container with fixative.",
+  });
+
+  /* ---- Biliary brushing (UPHS: Cytology, Brushings) ---- */
+  setP(site, "bile", "cyto", {
+    orders:["CYTOPATHOLOGY - GASTROINTESTINAL (NGPATH5)"],
+    container:"Sterile container with 5 mL saline",
+    medium:"Saline. Fresh, no fixative",
+    destination: site === "hup" ? cytoDest : "Cytology lab immediately; after hours, Central Receiving",
+    notes:"From the directory page for biliary brushings. Alternative order: Cytopathology - Other (NGPATH3), free text. Label with patient name, DOB, MRN and collection site. For flow, send a separate fresh aliquot with its own order.",
+    alert:"use a container with fixative" + (site === "hup" ? "." : ", or let the brushing air dry."),
+    source:"directory",
+  });
+
+  /* ---- Flow cytometry on fluid (UPHS: Leukemia/Lymphoma Evaluation by Flow Cytometry) ---- */
+  ["pleural","ascites"].forEach(id => setP(site, id, "flow", {
+    orders:["LEUKEMIA/LYMPHOMA EVALUATION BY FLOW (Immunophen)"],
+    container:"Separate sterile container, its own aliquot. Directory doesn't name a tube for fluids (blood goes in 2 lavender tubes)",
+    medium:"None. Fresh, unfixed",
+    destination:"Flow Cytometry",
+    notes:"Room temperature. Stable 48 h. Performed M–F only, so avoid Friday-afternoon sends when possible. Not requested electronically: needs a flow cytometry order or manual requisition with contact info. Pathologist picks the panel from the clinical info and volume sent.",
+    alert:"centrifuge, add fixative, or send clotted, hemolyzed or >48 h old fluid.",
+    source:"directory",
+  }));
+
+  /* ---- Body fluid cell count (UPHS: Fluid Count; C2001521) ---- */
+  const countTubes = {
+    hup: { pleural:"Lavender (EDTA) or green (lithium or sodium heparin) top tube",
+           ascites:"Lavender (EDTA) top tube",
+           joint:"Lavender (EDTA) top tube" },
+    pah: { pleural:"Lavender (EDTA) or pink (EDTA) top tube",
+           ascites:"Lavender (EDTA) or pink (EDTA) top tube",
+           joint:"Lavender (EDTA) or dark green (sodium heparin) top tube" },
+  };
+  ["pleural","ascites","joint"].forEach(id => {
+    const tube = countTubes[site]?.[id];
+    setP(site, id, "count", {
+      orders:["FLUID COUNTS (C2001521)"],
+      container: tube || "Directory lists HUP and PAH tubes only. Confirm for Presby (HUP uses " + countTubes.hup[id].toLowerCase() + ")",
+      medium:"Anticoagulant tube (not a plain cup)",
+      destination:"Hematology",
+      notes:"Room temperature. Stable only 1 h at room temp, <8 h refrigerated, so send promptly. Result 1–2 h routine, 1 h STAT." +
+        (id !== "joint" ? " If the fluid is visibly bloody, a body fluid hematocrit can be added: HEMATOCRIT BODY FLUID (C2001655), lavender tube, room temp." : ""),
+      alert:"send clotted, hemolyzed or previously centrifuged fluid. All are rejected.",
+      source: tube ? "directory" : undefined,
+    });
+  });
+
+  /* ---- Pleural / ascites / joint: bacterial culture (C BF + C ANA) ---- */
+  ["pleural","ascites","joint"].forEach(id => setP(site, id, "bact", {
+    orders:["BODY FLUID CULTURE","ANAEROBIC CULTURE"],
+    container:"Sterile, leak-proof container",
+    medium:"None",
+    destination:"Microbiology",
+    notes:"Refrigerate (stable 2 h), except if Neisseria or Haemophilus suspected: room temp, deliver immediately. Specimen source required. Anaerobic: 1 mL fluid in anaerobic transport media or Eswab. LIS: C BF, C ANA." +
+      (id !== "joint" ? " Alternative: CULTURE REC'D IN BACTEC VIALS (C BACTEC), room temp, stable 2 h; not valid for AFB or non-Candida fungal culture." : ""),
+    alert:"send in an anticoagulated tube.",
+    source:"directory",
+  }));
+
+  /* ---- Abscess / collection: Routine Culture (C ROUTINE) ---- */
+  setP(site, "abscess", "bact", {
+    orders:["ROUTINE CULTURE","ANAEROBIC CULTURE"],
+    container:"Sterile, leak-proof container (2 mL) or Eswab",
+    medium:"None",
+    destination:"Microbiology",
+    notes:"Room temperature. Rejected if >24 h after collection or dry swab. Specimen source required. LIS: C ROUTINE, C ANA.",
+    source:"directory",
+  });
+
+  /* ---- Bile: Routine Culture ---- */
+  setP(site, "bile", "bact", {
+    orders:["ROUTINE CULTURE"],
+    container:"Sterile, leak-proof container (2 mL) or Eswab",
+    medium:"None",
+    destination:"Microbiology",
+    notes:"Directory lists Routine Culture for biliary specimens. Room temperature. Specimen source required. LIS: C ROUTINE.",
+    source:"directory",
+  });
+
+  /* ---- Nephrostomy urine: Urine Culture (C UC) ---- */
+  setP(site, "neph", "bact", {
+    orders:["URINE CULT W SENSITIVITY"],
+    container:"Urine culture tube with secure lid (pour off from cup)",
+    medium:"None",
+    destination:"Microbiology",
+    notes:"Refrigerate. 5–10 mL, minimum 1 mL. Stable 2 h unpreserved, 24 h refrigerated. Enter nephrostomy as the source. LIS: C UC.",
+    alert:"send the urine collection cup to the lab.",
+    source:"directory",
+  });
+});
+
+/* ============================================================
+   APP
+   ============================================================ */
+const PROTO_ORDER = ["path","bact","afb","fungal","flow","cyto","count","molec"];
+const FRESH_PURPOSES = ["bact","afb","fungal","flow","molec","cyto"];
+
+const state = { site:null, cat:null, spec:null, picks:[], showResult:false };
+const $view = document.getElementById("view");
+const $crumbs = document.getElementById("crumbs");
+
+(function(){
+  const img = new Image();
+  img.onload = () => { const s=document.getElementById("logoSlot"); s.innerHTML=""; s.appendChild(img); };
+  img.src = "logo.png"; img.alt = "";
+})();
+
+const siteById = id => SITES.find(s=>s.id===id);
+const catById  = id => CATEGORIES.find(c=>c.id===id);
+const specById = id => Object.values(SPECIMENS).flat().find(s=>s.id===id);
+const proto = (spec, k) => PROTOCOLS[state.site]?.[spec]?.[k];
+
+/* Penn calls fresh-tissue flow a "Lymphoma Work-Up" */
+function purposeLabel(spec, k){
+  if(k==="flow" && catById(state.cat)?.id==="tissue")
+    return { name:"Lymphoma workup", desc:"Flow / heme path. Send fresh" };
+  if(k==="cyto" && catById(state.cat)?.id==="tissue")
+    return { name:"FNA cytology", desc:"Fine needle aspirate" };
+  if(k==="cyto" && spec==="bile")
+    return { name:"Cytology (brushing)", desc:"Biliary brushing" };
+  return PURPOSES[k];
+}
+
+function goBack(){
+  if(state.showResult) state.showResult=false;
+  else if(state.spec){ state.spec=null; state.picks=[]; }
+  else if(state.cat) state.cat=null;
+  else if(state.site) state.site=null;
+  render();
+}
+function renderCrumbs(){
+  if(!state.site){ $crumbs.innerHTML=""; return; }
+  const ctx=[siteById(state.site).name, state.cat&&catById(state.cat).name, state.spec&&specById(state.spec).name].filter(Boolean).join(" · ");
+  $crumbs.innerHTML=`<button class="back" id="topBack">‹ Back</button><span class="ctx">${ctx}</span>`;
+  document.getElementById("topBack").onclick=goBack;
+}
+
+function optButton(label, desc, onClick, extraClass="", tag=""){
+  const b = document.createElement("button");
+  b.className = "opt " + extraClass;
+  b.innerHTML = `<b>${label}${tag}</b>${desc?`<small>${desc}</small>`:""}`;
+  b.onclick = onClick;
+  return b;
+}
+
+function screen(stepNum, title, items, oneCol){
+  $view.innerHTML = `<div class="step-label">Step ${stepNum} of 4</div><h2>${title}</h2>`;
+  const g = document.createElement("div");
+  g.className = "grid" + (oneCol ? " one" : "");
+  items.forEach(i => g.appendChild(optButton(i.name, i.desc, i.go)));
+  $view.appendChild(g);
+}
+
+function renderPurposes(){
+  $view.innerHTML = `<div class="step-label">Step 4 of 4</div>
+    <h2>What is it going for?</h2>
+    <p class="hint">Select everything you're sending from this specimen.</p>`;
+  const g = document.createElement("div"); g.className = "grid";
+  PURPOSE_MAP[state.spec].forEach(k => {
+    const lab = purposeLabel(state.spec, k);
+    const on = state.picks.includes(k);
+    const tag = proto(state.spec,k) ? "" : ` <span class="tag">pending</span>`;
+    g.appendChild(optButton(lab.name, lab.desc, () => {
+      state.picks = on ? state.picks.filter(x=>x!==k) : [...state.picks, k];
+      renderPurposes();
+    }, "check" + (on?" on":""), tag));
+  });
+  $view.appendChild(g);
+  const n = state.picks.length;
+  const bar = document.createElement("div"); bar.className = "actions";
+  bar.innerHTML = `<button class="btn primary" id="go" ${n?"":"disabled"}>${n?`Show handling for ${n}`:"Select at least one"}</button>`;
+  $view.appendChild(bar);
+  document.getElementById("go").onclick = () => { state.showResult = true; render(); };
+}
+
+function field(k, v){
+  const pending = !v;
+  return `<div class="row"><div class="k">${k}</div><div class="v${pending?" pending":""}">${pending?"Pending Penn protocol":v}</div></div>`;
+}
+
+function badge(p){
+  return p?.source==="verified" ? `<span class="badge ok">✓ Verified: posted protocol + UPHS directory</span>`
+       : p?.source==="directory" ? `<span class="badge ok">✓ From UPHS lab test directory</span>`
+       : `<span class="badge prov">Provisional · not yet verified</span>`;
+}
+
+function renderResult(){
+  const picks = PROTO_ORDER.filter(k => state.picks.includes(k));
+  try{ window.goatcounter?.count?.({ path:`lookup/${state.site}/${state.spec}/${picks.join("+")}`,
+    title:`${siteById(state.site).name} · ${specById(state.spec).name} · ${picks.map(k=>purposeLabel(state.spec,k).name).join(", ")}`, event:true }); }catch(e){}
+  const pathFixed = picks.includes("path") && /formalin/i.test(proto(state.spec,"path")?.medium||"");
+  const freshOnes = picks.filter(k => FRESH_PURPOSES.includes(k));
+  const split = pathFixed && freshOnes.length
+    ? `<div class="alert split"><b>Split it.</b> Set aside the ${(a=>a.length>1?a.slice(0,-1).join(", ")+" and "+a.at(-1):a[0])(freshOnes.map(k=>purposeLabel(state.spec,k).name.toLowerCase()))} portion${freshOnes.length>1?"s":""} FRESH before anything touches formalin.</div>` : "";
+
+  const cards = picks.map(k => {
+    const p = proto(state.spec,k) || {};
+    const lab = purposeLabel(state.spec,k).name;
+    if(!p.container) return `<section class="rc pending"><h3>${lab}</h3><p class="how">Pending Penn protocol</p></section>`;
+    const med = /^none/i.test(p.medium||"") ? "Fresh, no fixative" : p.medium;
+    return `<section class="rc">
+      <div class="rc-h"><h3>${lab}</h3>${p.source?"":`<span class="badge prov">Provisional</span>`}</div>
+      <p class="how">${p.container}</p>
+      <p class="med">${med}</p>
+      ${p.alert?`<p class="dont"><b>Don't</b> ${p.alert}</p>`:""}
+      ${p.destination?`<p class="dest"><b>To:</b> ${p.destination}</p>`:""}
+      ${p.notes?`<p class="notes">${p.notes}</p>`:""}
+      ${p.orders?.length?`<details><summary>Order name (placed by primary team)</summary><p>${p.orders.join(" + ")}</p></details>`:""}
+    </section>`;
+  }).join("");
+
+  $view.innerHTML = `${split}${cards}
+    <div class="actions"><button class="btn primary" id="restartBtn">New specimen</button></div>`;
+  document.getElementById("restartBtn").onclick = ()=>{ state.cat=state.spec=null; state.picks=[]; state.showResult=false; render(); };
+}
+
+function render(){
+  renderCrumbs();
+  window.scrollTo({top:0});
+  if(!state.site){
+    return screen(1,"Which hospital?", SITES.map(s=>({name:s.name,desc:s.desc,go:()=>{state.site=s.id;render();}})), true);
+  }
+  if(!state.cat){
+    return screen(2,"Specimen category", CATEGORIES.map(c=>({name:c.name,desc:c.desc,go:()=>{state.cat=c.id;render();}})), true);
+  }
+  if(!state.spec){
+    return screen(3, state.cat==="tissue"?"Organ / site":"Fluid type",
+      SPECIMENS[state.cat].map(s=>({name:s.name,desc:s.desc,go:()=>{state.spec=s.id;state.picks=[];render();}})));
+  }
+  if(!state.showResult) return renderPurposes();
+  renderResult();
+}
+
+render();
+</script>
+</body>
+</html>

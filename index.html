@@ -11,6 +11,7 @@
     --blue-2:#0B2D6E;
     --red:#990000;       /* Penn red */
     --red-soft:#F6E6E6;
+    --accent:#F4A7A7;
     --bg:#F5F6F9;
     --card:#FFFFFF;
     --ink:#1A1F2E;
@@ -30,7 +31,7 @@
   h1{font-size:19px;font-weight:700;line-height:1.2}
   .sub{font-size:12.5px;opacity:.8;margin-top:2px}
 
-  main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:18px 16px 32px}
+  main{flex:1;width:100%;max-width:940px;margin:0 auto;padding:18px 16px 32px}
 
   .crumbs:empty{display:none}
   .intro{padding:6px 0 4px}
@@ -104,7 +105,7 @@
   .btn.primary{background:var(--blue);color:#fff}
   .btn.ghost{background:#fff;color:var(--blue)}
 
-  footer{text-align:center;font-size:11.5px;color:var(--muted);padding:16px;line-height:1.5}
+  footer{border-top:1px solid var(--line);text-align:center;font-size:11.5px;color:var(--muted);padding:16px;line-height:1.5}
   footer b{color:var(--blue)}
 
 
@@ -136,6 +137,45 @@
   .g-pending .g-how{color:#fff;font-weight:500;font-style:italic}
   .order-ref{font-size:13.5px;color:var(--muted)}
 
+  .top{background:var(--blue);color:#fff;border-bottom:3px solid var(--red)}
+  .top-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .badge-ir{width:40px;height:40px;border-radius:8px;background:var(--red);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .b-name{font-weight:700;font-size:16px;line-height:1.2}
+  .b-sub{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent)}
+  .top-tag{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;opacity:.65;text-align:right}
+  .hero{background:var(--blue);color:#fff;border-bottom:3px solid var(--red)}
+  .hero-in{max-width:760px;margin:0 auto;padding:48px 16px 40px}
+  .h-eyebrow{font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent)}
+  .h-title{font-size:clamp(30px,6vw,46px);font-weight:700;line-height:1.12;margin:12px 0 16px;letter-spacing:-.5px}
+  .h-title em{color:var(--accent);font-style:italic}
+  .h-sub{font-size:16.5px;line-height:1.6;opacity:.8;max-width:600px}
+  .h-by{font-size:14px;font-style:italic;opacity:.5;margin-top:18px}
+  .notice{background:#FFF8EC;border-bottom:1px solid #F1DFC0;color:#6B4A12;font-size:13.5px;line-height:1.5;padding:12px 16px;display:flex;gap:8px;justify-content:center}
+  .notice span:last-child{max-width:900px}
+  .notice b{color:#5A2E00}
+  .stepper{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px}
+  .st{display:flex;align-items:center;gap:8px;padding:12px 14px;font:inherit;font-size:14px;color:var(--muted);background:none;border:0;border-right:1px solid var(--line);text-align:left;cursor:default}
+  .st:last-child{border-right:0}
+  .st i{font-style:normal;width:22px;height:22px;border:1.5px solid currentColor;border-radius:50%;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .st.on{background:#EEF2FA;color:var(--blue);font-weight:600}
+  .st.done{color:var(--blue);cursor:pointer}
+  .st.done i{background:var(--blue);border-color:var(--blue);color:#fff}
+  .st small{display:block;font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .st span{min-width:0}
+  .hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .hcard{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;text-align:left;font:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+  .hcard:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(1,31,91,.08)}
+  .hcard b{display:block;font-size:16px;color:var(--blue)}
+  .hcard .addr{display:block;font-size:13.5px;color:var(--muted);margin-top:4px}
+  .hcard .st-tag{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:10px;color:var(--ok)}
+  .hcard .st-tag.warn{color:var(--warn)}
+  @media (max-width:600px){
+    .top-tag{display:none}
+    .hero-in{padding:32px 16px 28px}
+    .st{padding:10px 8px;font-size:12px;flex-direction:column;gap:4px;text-align:center}
+    .st small{display:none}
+  }
   @media (max-width:380px){.grid{grid-template-columns:1fr}}
 </style>
 <!-- Usage tracking (GoatCounter). Replace GC_CODE with your GoatCounter site code. Logs only site/specimen/test picked; no patient info. -->
@@ -144,26 +184,33 @@
 </head>
 <body>
 
-<header>
-  <div class="hwrap">
-    <!-- Logo slot: drop an approved logo file next to index.html as logo.png -->
-    <div class="logo-slot" id="logoSlot"><span>IR</span></div>
-    <div>
-      <h1>IR Specimen Handling Guide</h1>
-      <div class="sub">Penn Medicine sites · Point-of-care reference</div>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="badge-ir">IR</div>
+      <div><div class="b-name">Penn Medicine Sites</div><div class="b-sub">IR Specimen Guide</div></div>
     </div>
+    <div class="top-tag">Interventional Radiology · Clinical Decision Support</div>
   </div>
 </header>
 
+<section class="hero" id="hero">
+  <div class="hero-in">
+    <p class="h-eyebrow">Interventional Radiology · HUP · Presby · PAH</p>
+    <h1 class="h-title">Know exactly how to handle every <em>specimen</em>.</h1>
+    <p class="h-sub">Select your hospital, specimen type, and clinical purpose to get handling instructions at the point of care.</p>
+    <p class="h-by">Built by Anirudh Bikmal</p>
+  </div>
+</section>
+<div class="notice" id="notice"><span>⚠</span><span><b>Sourced from the UPHS Laboratory Test Directory.</b> Items marked Provisional are not yet confirmed. Not an official Penn Medicine resource. Verify with the lab before clinical use.</span></div>
+
 <main>
+  <nav class="stepper" id="stepper"></nav>
   <div class="crumbs" id="crumbs"></div>
   <div id="view"></div>
 </main>
 
-<footer>
-  Provisional tool. Always confirm with the posted site protocol or lab if unsure.<br>
-  Built by <b>Anirudh Bikmal</b>
-</footer>
+<footer>Built by <b>Anirudh Bikmal</b> · Always confirm with the posted site protocol or lab if unsure.</footer>
 
 <script>
 /* ============================================================
@@ -171,9 +218,9 @@
    ============================================================ */
 
 const SITES = [
-  { id:"hup",  name:"HUP",                    desc:"Hospital of the University of Pennsylvania" },
-  { id:"ppmc", name:"Penn Presbyterian", short:"Presby",      desc:"Penn Presbyterian Medical Center" },
-  { id:"pah",  name:"Pennsylvania Hospital", short:"PAH",  desc:"Pennsylvania Hospital" },
+  { id:"hup",  name:"HUP",                    desc:"Hospital of the University of Pennsylvania", full:"Hospital of the University of Pennsylvania", addr:"3400 Spruce St" },
+  { id:"ppmc", name:"Penn Presbyterian", short:"Presby",      desc:"Penn Presbyterian Medical Center", full:"Penn Presbyterian Medical Center", addr:"51 N 39th St" },
+  { id:"pah",  name:"Pennsylvania Hospital", short:"PAH",  desc:"Pennsylvania Hospital", full:"Pennsylvania Hospital", addr:"800 Spruce St" },
 ];
 
 const CATEGORIES = [
@@ -504,13 +551,14 @@ SITES.forEach(({id:site}) => {
 const PROTO_ORDER = ["path","bact","afb","fungal","flow","cyto","count","molec"];
 const FRESH_PURPOSES = ["bact","afb","fungal","flow","molec","cyto"];
 
-const state = { intro:true, site:null, cat:null, spec:null, picks:[], showResult:false };
+const state = { intro:false, site:null, cat:null, spec:null, picks:[], showResult:false };
 const $view = document.getElementById("view");
 const $crumbs = document.getElementById("crumbs");
+const $stepper = document.getElementById("stepper");
 
 (function(){
   const img = new Image();
-  img.onload = () => { const s=document.getElementById("logoSlot"); s.innerHTML=""; s.appendChild(img); };
+  img.onload = () => { const s=document.querySelector(".badge-ir"); if(s){ s.innerHTML=""; s.style.background="#fff"; img.style.cssText="width:100%;height:100%;object-fit:contain"; s.appendChild(img);}  };
   img.src = "logo.png"; img.alt = "";
 })();
 
@@ -535,12 +583,10 @@ function goBack(){
   else if(state.spec){ state.spec=null; state.picks=[]; }
   else if(state.cat) state.cat=null;
   else if(state.site) state.site=null;
-  else state.intro=true;
   render();
 }
 function renderCrumbs(){
-  if(state.intro){ $crumbs.innerHTML=""; return; }
-  if(!state.site){ $crumbs.innerHTML=`<button class="back" id="topBack">‹ Back</button>`; document.getElementById("topBack").onclick=goBack; return; }
+  if(!state.site){ $crumbs.innerHTML=""; return; }
   const ctx=[siteById(state.site).name, state.cat&&catById(state.cat).name, state.spec&&specById(state.spec).name].filter(Boolean).join(" · ");
   $crumbs.innerHTML=`<button class="back" id="topBack">‹ Back</button><span class="ctx">${ctx}</span>`;
   document.getElementById("topBack").onclick=goBack;
@@ -554,8 +600,31 @@ function optButton(label, desc, onClick, extraClass="", tag=""){
   return b;
 }
 
+const STEP_NAMES = ["Location","Specimen","Type","Purpose"];
+function renderStepper(){
+  const cur = !state.site?0 : !state.cat?1 : !state.spec?2 : 3;
+  const vals = [state.site&&siteById(state.site).name, state.cat&&catById(state.cat).name, state.spec&&specById(state.spec).name, null];
+  const labels = ["Hospital","Specimen","Type","Purpose"];
+  $stepper.innerHTML = labels.map((l,i)=>`<button class="st ${i===cur?"on":i<cur?"done":""}" data-i="${i}"><i>${i<cur?"✓":i+1}</i><span>${l}${vals[i]&&i<cur?`<small>${vals[i]}</small>`:""}</span></button>`).join("");
+  $stepper.querySelectorAll(".st.done").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i; state.showResult=false;
+    if(i<=2){ state.spec=null; state.picks=[]; }
+    if(i<=1) state.cat=null;
+    if(i===0) state.site=null;
+    render();
+  });
+}
+function renderHospitals(){
+  $view.innerHTML = `<div class="step-label">Step 1 — Location</div><h2>Which hospital?</h2>
+    <div class="hgrid">${SITES.map(s=>{
+      const prov = Object.values(PROTOCOLS[s.id]||{}).some(o=>Object.values(o).some(p=>!p.source));
+      return `<button class="hcard" data-id="${s.id}"><b>${s.full}</b><span class="addr">${s.addr}</span><span class="st-tag${prov?" warn":""}">● ${prov?"Mostly verified":"Directory verified"}</span></button>`;
+    }).join("")}</div>`;
+  $view.querySelectorAll(".hcard").forEach(b=>b.onclick=()=>{ state.site=b.dataset.id; render(); });
+}
+
 function screen(stepNum, title, items, oneCol){
-  $view.innerHTML = `<div class="step-label">Step ${stepNum} of 4</div><h2>${title}</h2>`;
+  $view.innerHTML = `<div class="step-label">Step ${stepNum} — ${STEP_NAMES[stepNum-1]}</div><h2>${title}</h2>`;
   const g = document.createElement("div");
   g.className = "grid" + (oneCol ? " one" : "");
   items.forEach(i => g.appendChild(optButton(i.name, i.desc, i.go)));
@@ -563,7 +632,7 @@ function screen(stepNum, title, items, oneCol){
 }
 
 function renderPurposes(){
-  $view.innerHTML = `<div class="step-label">Step 4 of 4</div>
+  $view.innerHTML = `<div class="step-label">Step 4 — Purpose</div>
     <h2>What is it going for?</h2>
     <p class="hint">Select everything you're sending from this specimen.</p>`;
   const g = document.createElement("div"); g.className = "grid";
@@ -645,11 +714,12 @@ function renderResult(){
 
 function render(){
   renderCrumbs();
+  renderStepper();
+  const first = !state.site;
+  document.getElementById("hero").style.display = first ? "" : "none";
+  document.getElementById("notice").style.display = first ? "" : "none";
   window.scrollTo({top:0});
-  if(state.intro) return renderIntro();
-  if(!state.site){
-    return screen(1,"Which hospital?", SITES.map(s=>({name:s.name,desc:s.desc,go:()=>{state.site=s.id;render();}})), true);
-  }
+  if(first) return renderHospitals();
   if(!state.cat){
     return screen(2,"Specimen category", CATEGORIES.map(c=>({name:c.name,desc:c.desc,go:()=>{state.cat=c.id;render();}})), true);
   }

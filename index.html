@@ -271,6 +271,7 @@ const SPECIMENS = {
     { id:"soft",      name:"Soft tissue" },
     { id:"adrenal",   name:"Adrenal" },
     { id:"bm",        name:"Bone marrow", desc:"Core biopsy + aspirate" },
+    { id:"fatpad",    name:"Abdominal fat pad", desc:"Amyloid workup" },
   ],
   fluid: [
     { id:"pleural",   name:"Pleural fluid", desc:"Thoracentesis" },
@@ -308,6 +309,7 @@ const PURPOSE_MAP = {
   soft:["path","flow","bact","afb","fungal"],
   adrenal:["path","cyto"],
   bm:["path","aspirate","slides","salcore"],
+  fatpad:["path"],
   pleural:["cyto","count","bact","afb","fungal","flow"],
   ascites:["cyto","count","bact","afb","fungal","flow"],
   joint:["count","bact","afb","fungal"],
@@ -569,6 +571,16 @@ SITES.forEach(({id:site}) => {
     source:"directory",
   });
 
+  /* ---- Abdominal fat pad for amyloid: provisional, no dedicated directory page ---- */
+  setP(site, "fatpad", "path", {
+    orders:[],
+    container:"Labeled specimen container",
+    medium:"Neutral buffered formalin",
+    destination: spDest,
+    notes:"No dedicated directory page. Sent as Tissue, Routine Processing with \"rule out amyloid, Congo red\" written as the special study on the requisition. Several cores or fragments improve yield. If amyloid typing is wanted, note it on the requisition; typing is usually done on the same fixed tissue.",
+    alert:"send fat pad tissue in saline or dry if only amyloid staining is needed.",
+  });
+
   /* ---- Bone marrow (Penn Bone Marrow Collection + Slide Tip Sheets) ---- */
   const bmOrder = ["SURGICAL PATHOLOGY - HEMATOLOGIC (SPHEM)","Px SGPATH11"];
   const bmDest = site === "hup"
@@ -658,6 +670,7 @@ const proto = (spec, k) => PROTOCOLS[state.site]?.[spec]?.[k];
 
 /* Penn calls fresh-tissue flow a "Lymphoma Work-Up" */
 function purposeLabel(spec, k){
+  if(spec==="fatpad" && k==="path") return { name:"Amyloid (Congo red)", desc:"Histology + special stain" };
   if(spec==="bm" && k==="path") return { name:"Core biopsy", desc:"Histology (first core)" };
   if(k==="flow" && catById(state.cat)?.id==="tissue")
     return { name:"Lymphoma workup", desc:"Flow / heme path. Send fresh" };

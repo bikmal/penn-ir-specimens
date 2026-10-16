@@ -280,6 +280,7 @@ const SPECIMENS = {
     { id:"abscess",   name:"Abscess / collection", desc:"Aspiration / drain placement" },
     { id:"bile",      name:"Bile", desc:"Cholangiogram / biliary drainage" },
     { id:"neph",      name:"Nephrostomy urine", desc:"PCN placement / exchange" },
+    { id:"csf",       name:"CSF", desc:"Lumbar puncture" },
   ],
 };
 
@@ -316,6 +317,7 @@ const PURPOSE_MAP = {
   abscess:["bact","afb","fungal","cyto"],
   bile:["bact","cyto"],
   neph:["bact","count","cyto"],
+  csf:["count","cyto","flow","bact"],
 };
 
 /* PROTOCOLS[site][specimen][purpose] = {...}
@@ -623,6 +625,38 @@ SITES.forEach(({id:site}) => {
     source:"directory",
   });
 
+  /* ---- CSF (UPHS: Fluid Count; Cytology, Cerebrospinal Fluid; Leukemia/Lymphoma Flow) ---- */
+  setP(site, "csf", "count", {
+    orders:["FLUID COUNTS (C2001521)"],
+    container: site==="ppmc" ? "Sterile, non-additive tube (listed for HUP and PAH; confirm for Presby)" : "Sterile, non-additive tube",
+    medium:"None",
+    destination:"Hematology",
+    notes:"Room temperature. Stable only 1 h at room temp, <8 h refrigerated, so send promptly. Result 1–2 h routine, 1 h STAT.",
+    alert:"send clotted, hemolyzed or previously centrifuged CSF.",
+    source: site==="ppmc" ? undefined : "directory",
+  });
+  setP(site, "csf", "cyto", {
+    orders:["CYTOPATHOLOGY - BODY FLUID (NGPATH3)","or CYTOPATHOLOGY - OTHER (NGPATH3)"],
+    container:"Sterile, non-additive tube",
+    medium:"At least 1–2 mL. Fresh, no fixative",
+    destination: site === "hup"
+      ? "Cytopathology: secure-send tube or deliver to 6 Founders (7:30a–10p); after 10p, 7 Founders Central Receiving. 3 PAV Central Receiving any time"
+      : "Cytology lab (8a–4:30p); after 4:30p, Central Receiving",
+    notes: (site === "hup" ? "Affix Cerner lab label (two patient identifiers and specimen source)." : "Label with patient name, DOB, MRN and collection site.") +
+      " For flow, send a separate fresh aliquot with its own order. For molecular or special studies, select that option in the order.",
+    alert:"add fixative.",
+    source:"directory",
+  });
+  setP(site, "csf", "flow", {
+    orders:["LEUKEMIA/LYMPHOMA EVALUATION BY FLOW (Immunophen)"],
+    container:"Separate sterile, non-additive tube, its own aliquot",
+    medium:"None. Fresh, unfixed",
+    destination:"Flow Cytometry",
+    notes:"Room temperature. Stable 48 h. Performed M–F only. Needs a flow cytometry order or manual requisition with contact info. Pathologist picks the panel from the clinical info and volume sent.",
+    alert:"centrifuge, add fixative, or send clotted or >48 h old CSF.",
+    source:"directory",
+  });
+
   /* ---- Nephrostomy urine: cell count (UPHS: Urinalysis, Microscopic / UA Dipstick & Microscopic) ---- */
   setP(site, "neph", "count", {
     orders:["URINALYSIS MICROSCOPIC (C2001537)","or URINALYSIS WITH MICRO AND DIPSTICK (O16822)"],
@@ -798,7 +832,8 @@ function containerIcons(p){
   const t = (p.container||"")+" "+(p.medium||"");
   const out=[];
   const add=(svg,cap)=>out.push(`<figure class="ic">${svg}<figcaption>${cap}</figcaption></figure>`);
-  if(/UA tube|urinalysis tube/i.test(t)) add(TUBE("#F2C94C","#D64545"),"UA tube");
+  if(/non-additive tube/i.test(t)) add(TUBE("#E7E9EE","#C94A4A"),"Sterile tube");
+  else if(/UA tube|urinalysis tube/i.test(t)) add(TUBE("#F2C94C","#D64545"),"UA tube");
   else if(/urine culture tube/i.test(t)) add(TUBE("#8A8F99"),"Urine culture tube");
   if(/lavender|EDTA/i.test(t)) add(TUBE("#9B7BC8"),"Lavender (EDTA)");
   if(/green/i.test(t)) add(TUBE("#2E8B57"),"Green (heparin)");

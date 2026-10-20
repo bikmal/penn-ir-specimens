@@ -229,7 +229,7 @@ const RULES = {
 const HUP_GROUPS={
   1:{label:"Group 1",risk:"Low bleeding risk",cls:"A",
      labs:"INR / platelets not needed, unless Coumadin was not held appropriately.",
-     ac:[["Heparin","Off at onset of procedure"],["Coumadin","Off 5 days"],["Other anticoagulants","Off 24 hours"]]},
+     ac:[["Heparin","Off at onset"],["Coumadin","Off 5 days"],["Other anticoagulants","Off 24 hours"]]},
   2:{label:"Group 2",risk:"Low bleeding risk",cls:"B",
      labs:"Check PennChart for INR / PLT within 3 months. If none, labs not required unless on Coumadin. If available, use the thresholds above.",
      ac:[["Heparin","Off 2 hours"],["Coumadin","5-day hold"],["Other anticoagulants","24-hour hold"]]},
@@ -241,36 +241,36 @@ const HUP_GROUPS={
 const HUP=[
   [1,"Paracentesis / thoracentesis","",true],
   [1,"Drainage tube check / change","Abscess, biliary, GU (PCN / PCNU)",true],
-  [1,"Tunneled peritoneal drain placement","e.g. PleurX / Aspira",true],
+  [1,"Tunneled peritoneal drain placement","eg Pleurx / Asept",true],
   [1,"Lymphangiogram / TDE","",true],
-  [1,"Nerve block","",true],
+  [1,"Nerve blocks","",true],
   [1,"Venous sampling","",true],
-  [1,"Non-tunneled venous catheter, PICC / SBCC","Includes tunneled catheter exchange / removal",false],
+  [1,"Non-tunneled venous catheters, PICC / SBCC, tunneled catheter exchange / removal","",false],
   [1,"Bone marrow biopsy / aspiration","",false],
   [1,"G / J / GJ change","",false],
-  [1,"IVC filter placement / non-complex removal","",false],
-  [1,"Peripheral vein intervention","Saphenous vein ablation, phlebectomy",false],
+  [1,"IVC filter placement and non-complex removal","",false],
+  [1,"Peripheral vein interventions","Saphenous vein ablation, phlebectomy",false],
   [1,"JJ removal","",false],
   [2,"New TDC / Hickman placement","",true,"≤ 2.0","≥ 25K"],
   [2,"Transjugular liver biopsy","",true,"≤ 2.0","≥ 25K"],
-  [2,"HD fistulogram / PTA","Except central venous angioplasty or history of arm swelling (those are Group 3)",true,"≤ 2.0","≥ 25K"],
-  [2,"Chest port placement / removal","",true,"≤ 1.5","≥ 50K"],
+  [2,"HD fistulogram / PTA","Except central venous angioplasty or Hx of arm swelling",true,"≤ 2.0","≥ 25K"],
+  [2,"Chest port placement and removal","",true,"≤ 1.5","≥ 50K"],
   [2,"New superficial drain placement","Breast, abdominal wall, subcutaneous",true,"≤ 1.5","≥ 50K"],
-  [2,"Arteriography / intervention, sheath ≤ 6 Fr","Includes UAE, chemo/radioembolization, LE arteriography / revascularization",true,"≤ 1.5","≥ 50K"],
-  [2,"Emergent embolization for arterial bleed","e.g. GI bleed, trauma, bronchial artery",true,"≤ 1.5","≥ 50K"],
-  [2,"PAVM embolization","",true,"≤ 1.5","≥ 50K"],
+  [2,"Diagnostic arteriography / intervention with planned sheath size ≤ 6 French","Includes UAE, chemo/radioembolization, lower extremity arteriography / revascularization",true,"≤ 1.5","≥ 50K"],
+  [2,"Emergent embolization for arterial bleed","ex. GI bleed, trauma, bronchial artery",true,"≤ 1.5","≥ 50K"],
+  [2,"PAVM","",true,"≤ 1.5","≥ 50K"],
   [2,"Denver shunt placement","",true,"≤ 1.5","≥ 50K"],
   [3,"New biliary drainage","Including cholecystostomy tube",true,"≤ 1.5","≥ 50K"],
   [3,"New PCN / PCNU placement","",true,"≤ 1.5","≥ 50K"],
   [3,"New deep drain placement","Intra-abdominal, intra-thoracic",true,"≤ 1.5","≥ 50K"],
-  [3,"New gastrostomy / gastrojejunostomy","",true,"≤ 1.5","≥ 50K"],
+  [3,"New gastrostomy / gastrojejunostomy placement","",true,"≤ 1.5","≥ 50K"],
   [3,"Percutaneous core biopsy","",true,"≤ 1.5","≥ 50K"],
-  [3,"Ablation","",true,"≤ 1.5","≥ 50K"],
-  [3,"TIPS / portal vein intervention","",true,"≤ 1.5","≥ 50K"],
-  [3,"Arterial intervention, sheath > 6 Fr","",true,"≤ 1.5","≥ 50K"],
+  [3,"Ablations","",true,"≤ 1.5","≥ 50K"],
+  [3,"TIPS / portal vein interventions","",true,"≤ 1.5","≥ 50K"],
+  [3,"Arterial intervention requiring > 6 French sheath","",true,"≤ 1.5","≥ 50K"],
   [3,"Dialysis access with central vein angioplasty / venous recanalization","",true,"≤ 1.5","≥ 50K"],
-  [3,"IVC filter removal — complex","",true,"≤ 1.5","≥ 50K"],
-  [3,"Lower extremity / IVC venous recanalization / thrombolysis","",  "dw","≥ 1.5","≤ 50K","The sheet prints PLT ≤ 50K and INR ≥ 1.5 for this line, the reverse of every other line. Likely a typo for INR ≤ 1.5, PLT ≥ 50K. Confirm with the attending."]
+  [3,"IVC filter removal - complex","",true,"≤ 1.5","≥ 50K"],
+  [3,"Lower extremity / IVC venous recanalization / thrombolysis","",  "dw","≥ 1.5","≤ 50K","Shown exactly as printed on the sheet (PLT ≤ 50K, INR ≥ 1.5), which reads opposite to every other line. Confirm thresholds with the attending."]
 ].map(([g,name,sub,hold,inr,plt,flag],i)=>({id:i,g,name,sub,hold,inr,plt,flag,cat:HUP_GROUPS[g].cls}));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -352,7 +352,7 @@ function showCard(p){
     const held=MEDS.filter(m=>r.pre[m.k]!=="NH"), kept=MEDS.filter(m=>r.pre[m.k]==="NH");
     meds=`<div class="row hd"><span class="m">Medication</span><span>Before</span><span>After</span></div>`+
       held.map(m=>`<div class="row"><span class="m"><b>${esc(m.n)}</b><small>${esc(m.s)}</small></span><span class="hold">${txt(r.pre[m.k])}</span><span>${r.post[m.k]===null?'<span class="na">Not on sheet</span>':esc(r.post[m.k])}</span></div>`).join("")+
-      (kept.length?`<div class="ok" style="margin-top:8px"><b>Do NOT hold:</b> ${kept.map(m=>esc(m.n.toLowerCase())).join(", ")}.${p.cat==="B"?' Prophylactic anticoag: if held, restart evening of procedure.':''}</div>`:"");
+      (kept.length?`<div class="ok" style="margin-top:8px"><b>Do NOT hold:</b> ${kept.map(m=>esc(m.n.toLowerCase())).join(", ")}.${p.cat==="B"?' After procedure, per sheet: prophylactic anticoagulation, restart evening of procedure.':''}</div>`:"");
   }
   const flag=/Chest tube/.test(p.name)?`<div class="flag">Handwritten * next to this on the posted sheet. Confirm with the attending.</div>`:"";
   $("#out").innerHTML=`<div class="card">

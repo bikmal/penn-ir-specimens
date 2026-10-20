@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PAH IR Anticoag Guide</title>
+<title>Penn IR Anticoag Guide</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,6 +70,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ok b{color:var(--a)}
 .flag{font-size:13px;background:var(--b-soft);padding:8px 16px}
 .big{font-size:16px;font-weight:600;color:var(--a)}
+.site{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);margin-bottom:6px}
+.site button{flex:1;font:inherit;font-size:15px;font-weight:600;padding:10px 8px;border:0;background:none;color:var(--fg);cursor:pointer}
+.site button+button{border-left:1px solid var(--line)}
+.site button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.site button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.site small{display:block;font-weight:400;font-size:12px;opacity:.8}
+.foot-note{font-size:13px;color:var(--muted);margin:6px 0 0}
 footer{margin-top:20px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
 @media (max-width:420px){.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.row .m{grid-column:1/-1}.row.hd .m{display:none}}
 </style>
@@ -77,16 +84,20 @@ footer{margin-top:20px;font-size:12px;color:var(--muted);display:flex;flex-direc
 <body>
 
 <div class="wrap">
-  <div class="eyebrow">Pennsylvania Hospital · IR</div>
+  <div class="eyebrow" id="eyebrow">Penn Medicine · IR</div>
   <h1>Anticoag &amp; Coag Lab Guide</h1>
+  <div class="site" role="group" aria-label="Hospital">
+    <button id="site-hup" data-site="hup" aria-pressed="true">HUP<small>Hospital of the Univ. of Penn</small></button>
+    <button id="site-pah" data-site="pah" aria-pressed="false">Pennsy<small>Pennsylvania Hospital</small></button>
+  </div>
   <div class="search">
     <input id="q" type="search" placeholder="Type a procedure (port, TIPS, biopsy…)" autocomplete="off" aria-label="Search procedures">
     <button id="back" hidden>All</button>
   </div>
   <main id="out" aria-live="polite"></main>
   <footer>
-    <div>Guidelines, not hard policies. Exceptions are at the discretion of the performing IR attending.</div>
-    <div>From the posted PAH IR guideline sheets (updated 10/23/2025).</div>
+    <div>Guidelines, not hard policies. They may be waived after discussion with the performing IR attending.</div>
+    <div id="src">From the posted PAH IR guideline sheets (updated 10/23/2025).</div>
     <div>Questions or corrections? Email <a href="mailto:anirudhbikmal@gmail.com?subject=PAH%20IR%20Anticoag%20Guide" style="color:var(--accent)">anirudhbikmal@gmail.com</a></div>
     <div>Built by <b>Anirudh Bikmal</b></div>
   </footer>
@@ -214,9 +225,69 @@ const RULES = {
 };
 
 
+
+const HUP_GROUPS={
+  1:{label:"Group 1",risk:"Low bleeding risk",cls:"A",
+     labs:"INR / platelets not needed, unless Coumadin was not held appropriately.",
+     ac:[["Heparin","Off at onset of procedure"],["Coumadin","Off 5 days"],["Other anticoagulants","Off 24 hours"]]},
+  2:{label:"Group 2",risk:"Low bleeding risk",cls:"B",
+     labs:"Check PennChart for INR / PLT within 3 months. If none, labs not required unless on Coumadin. If available, use the thresholds above.",
+     ac:[["Heparin","Off 2 hours"],["Coumadin","5-day hold"],["Other anticoagulants","24-hour hold"]]},
+  3:{label:"Group 3",risk:"High bleeding risk",cls:"C",
+     labs:"INR and platelets REQUIRED within 1 month of procedure.",
+     ac:[["Heparin","Off 2 hours"],["Coumadin","5-day hold"],["Other anticoagulants","24-hour hold"]]}
+};
+// [group, name, sub, hold: true | false | "dw", inr, plt, flag]
+const HUP=[
+  [1,"Paracentesis / thoracentesis","",true],
+  [1,"Drainage tube check / change","Abscess, biliary, GU (PCN / PCNU)",true],
+  [1,"Tunneled peritoneal drain placement","e.g. PleurX / Aspira",true],
+  [1,"Lymphangiogram / TDE","",true],
+  [1,"Nerve block","",true],
+  [1,"Venous sampling","",true],
+  [1,"Non-tunneled venous catheter, PICC / SBCC","Includes tunneled catheter exchange / removal",false],
+  [1,"Bone marrow biopsy / aspiration","",false],
+  [1,"G / J / GJ change","",false],
+  [1,"IVC filter placement / non-complex removal","",false],
+  [1,"Peripheral vein intervention","Saphenous vein ablation, phlebectomy",false],
+  [1,"JJ removal","",false],
+  [2,"New TDC / Hickman placement","",true,"≤ 2.0","≥ 25K"],
+  [2,"Transjugular liver biopsy","",true,"≤ 2.0","≥ 25K"],
+  [2,"HD fistulogram / PTA","Except central venous angioplasty or history of arm swelling (those are Group 3)",true,"≤ 2.0","≥ 25K"],
+  [2,"Chest port placement / removal","",true,"≤ 1.5","≥ 50K"],
+  [2,"New superficial drain placement","Breast, abdominal wall, subcutaneous",true,"≤ 1.5","≥ 50K"],
+  [2,"Arteriography / intervention, sheath ≤ 6 Fr","Includes UAE, chemo/radioembolization, LE arteriography / revascularization",true,"≤ 1.5","≥ 50K"],
+  [2,"Emergent embolization for arterial bleed","e.g. GI bleed, trauma, bronchial artery",true,"≤ 1.5","≥ 50K"],
+  [2,"PAVM embolization","",true,"≤ 1.5","≥ 50K"],
+  [2,"Denver shunt placement","",true,"≤ 1.5","≥ 50K"],
+  [3,"New biliary drainage","Including cholecystostomy tube",true,"≤ 1.5","≥ 50K"],
+  [3,"New PCN / PCNU placement","",true,"≤ 1.5","≥ 50K"],
+  [3,"New deep drain placement","Intra-abdominal, intra-thoracic",true,"≤ 1.5","≥ 50K"],
+  [3,"New gastrostomy / gastrojejunostomy","",true,"≤ 1.5","≥ 50K"],
+  [3,"Percutaneous core biopsy","",true,"≤ 1.5","≥ 50K"],
+  [3,"Ablation","",true,"≤ 1.5","≥ 50K"],
+  [3,"TIPS / portal vein intervention","",true,"≤ 1.5","≥ 50K"],
+  [3,"Arterial intervention, sheath > 6 Fr","",true,"≤ 1.5","≥ 50K"],
+  [3,"Dialysis access with central vein angioplasty / venous recanalization","",true,"≤ 1.5","≥ 50K"],
+  [3,"IVC filter removal — complex","",true,"≤ 1.5","≥ 50K"],
+  [3,"Lower extremity / IVC venous recanalization / thrombolysis","",  "dw","≥ 1.5","≤ 50K","The sheet prints PLT ≤ 50K and INR ≥ 1.5 for this line, the reverse of every other line. Likely a typo for INR ≤ 1.5, PLT ≥ 50K. Confirm with the attending."]
+].map(([g,name,sub,hold,inr,plt,flag],i)=>({id:i,g,name,sub,hold,inr,plt,flag,cat:HUP_GROUPS[g].cls}));
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let sel=null;
+let site="hup";
+try{const v=localStorage.getItem("pennSite"); if(v==="hup"||v==="pah") site=v;}catch(e){}
+if(location.hash==="#pah"||location.hash==="#pennsy") site="pah";
+if(location.hash==="#hup") site="hup";
+const SRC={hup:"From the posted HUP (Penn IR) coagulation lab guideline sheet.",pah:"From the posted PAH IR guideline sheets (updated 10/23/2025)."};
+function setSite(v){
+  site=v;
+  try{localStorage.setItem("pennSite",v);}catch(e){}
+  document.querySelectorAll(".site button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.site===v));
+  $("#eyebrow").textContent=(v==="hup"?"HUP":"Pennsylvania Hospital")+" · IR";
+  $("#src").textContent=SRC[v];
+  $("#q").value=""; showList();
+}
 
 function txt(v){
   if(typeof v==="object"&&v) return `${esc(v.gt)} <span class="na">(${esc(v.lt.replace(/^(Hold|Withhold) /,""))} if GFR&nbsp;&lt;60)</span>`;
@@ -227,19 +298,47 @@ function showList(){
   sel=null; $("#back").hidden=true;
   const terms=$("#q").value.trim().toLowerCase().split(/\s+/).filter(Boolean);
   const hit=p=>terms.every(t=>(p.name+" "+p.sub).toLowerCase().includes(t));
-  const matches=PROCS.filter(hit);
+  const list=site==="hup"?HUP:PROCS;
+  const matches=list.filter(hit);
   if(terms.length && matches.length===1){ return showCard(matches[0]); }
   let h="";
-  for(const c of ["A","B","C"]){
-    const items=matches.filter(p=>p.cat===c); if(!items.length) continue;
-    h+=`<div class="group"><h2><span class="badge ${c}">${c}</span>${CATS[c].risk}</h2><ul>`+
-      items.map(p=>`<li><button class="proc" data-id="${p.id}"><span class="badge ${c}">${c}</span><span>${esc(p.name)}${p.sub?` <small>· ${esc(p.sub)}</small>`:""}</span></button></li>`).join("")+`</ul></div>`;
+  const groups=site==="hup"?[1,2,3].map(g=>({k:g,cls:HUP_GROUPS[g].cls,badge:g,title:HUP_GROUPS[g].risk})):["A","B","C"].map(c=>({k:c,cls:c,badge:c,title:CATS[c].risk}));
+  for(const G of groups){
+    const items=matches.filter(p=>(site==="hup"?p.g:p.cat)===G.k); if(!items.length) continue;
+    const c=G.cls;
+    h+=`<div class="group"><h2><span class="badge ${c}">${G.badge}</span>${site==="hup"?"Group "+G.k+" · ":""}${G.title}</h2><ul>`+
+      items.map(p=>`<li><button class="proc" data-id="${p.id}"><span class="badge ${c}">${G.badge}</span><span>${esc(p.name)}${p.sub?` <small>· ${esc(p.sub)}</small>`:""}</span></button></li>`).join("")+`</ul></div>`;
   }
   $("#out").innerHTML=h||`<div class="empty">No match. Try a shorter word, or ask the attending.</div>`;
 }
 
+function showHup(p){
+  const G=HUP_GROUPS[p.g];
+  const labs = p.g===1
+    ? `<div class="labs">${esc(G.labs)}</div>`
+    : `<div class="labs">INR <b>${esc(p.inr)}</b> · PLT <b>${esc(p.plt)}</b><p>${esc(G.labs)}</p>${p.g===3?'<p>Liver disease: SIR suggests INR &lt; 2.5 and PLT &gt; 30K for high-risk procedures. Use is up to the performing attending.</p>':''}</div>`;
+  let meds;
+  if(p.hold==="dw"){
+    meds=`<div class="hold" style="font-size:16px">Anticoagulant cessation: discuss with attending.</div><div class="ok" style="margin-top:6px"><b>Do NOT hold:</b> aspirin / Plavix.</div>`;
+  } else if(p.hold){
+    meds=`<div class="row hd"><span class="m">Medication</span><span>Before</span><span></span></div>`+
+      G.ac.map(([n,v])=>`<div class="row"><span class="m"><b>${esc(n)}</b></span><span class="hold">${esc(v)}</span><span></span></div>`).join("")+
+      `<div class="ok" style="margin-top:8px"><b>Do NOT hold:</b> aspirin / Plavix.</div>`;
+  } else {
+    meds=`<div class="big">Do NOT hold anticoagulants.</div><div class="ok" style="margin-top:4px"><b>Do NOT hold:</b> aspirin / Plavix.</div>`;
+  }
+  const flag=p.flag?`<div class="flag">${esc(p.flag)}</div>`:"";
+  $("#out").innerHTML=`<div class="card">
+    <div class="ph ${p.cat}"><div class="cat">${G.label} · ${G.risk}</div><h3>${esc(p.name)}</h3>${p.sub?`<p>${esc(p.sub)}</p>`:""}</div>
+    ${flag}
+    <div class="sec"><h4>Labs</h4>${labs}</div>
+    <div class="sec"><h4>Anticoagulation</h4>${meds}<p class="foot-note">The HUP sheet does not list restart timing.</p></div></div>`;
+  window.scrollTo({top:0});
+}
+
 function showCard(p){
   sel=p.id; $("#back").hidden=false;
+  if(site==="hup") return showHup(p);
   const r=RULES[p.cat];
   const plt=p.name.startsWith("Bone marrow")?"no threshold":r.labs.plt;
   const inr=p.name==="Paracentesis"?"no threshold":r.labs.inr;
@@ -266,8 +365,9 @@ function showCard(p){
 
 $("#q").addEventListener("input",showList);
 $("#back").addEventListener("click",()=>{$("#q").value="";showList();$("#q").focus();});
-$("#out").addEventListener("click",e=>{const b=e.target.closest(".proc"); if(b) showCard(PROCS[+b.dataset.id]);});
-showList();
+$("#out").addEventListener("click",e=>{const b=e.target.closest(".proc"); if(b) showCard((site==="hup"?HUP:PROCS)[+b.dataset.id]);});
+document.querySelectorAll(".site button").forEach(b=>b.addEventListener("click",()=>setSite(b.dataset.site)));
+setSite(site);
 </script>
 </body>
 </html>
